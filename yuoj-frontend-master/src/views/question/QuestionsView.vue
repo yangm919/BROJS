@@ -118,7 +118,7 @@ const columns = [
     slotName: "tags",
   },
   {
-    title: "通过率",
+    title: "提交成功率",
     slotName: "acceptedRate",
   },
   {

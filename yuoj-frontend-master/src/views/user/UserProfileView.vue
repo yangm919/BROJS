@@ -44,13 +44,13 @@
               <div class="stat-number">
                 {{ statistics.acceptedSubmissions || 0 }}
               </div>
-              <div class="stat-label">正确提交数</div>
+              <div class="stat-label">成功提交数</div>
             </div>
             <div class="stat-item">
               <div class="stat-number">
                 {{ formatRate(statistics.acceptanceRate) }}%
               </div>
-              <div class="stat-label">正确率</div>
+              <div class="stat-label">提交成功率</div>
             </div>
             <div class="stat-item">
               <div class="stat-number">
@@ -125,7 +125,7 @@ const formatDate = (date: string) => {
 };
 
 /**
- * 格式化正确率
+ * 格式化提交成功率
  */
 const formatRate = (rate: number | undefined) => {
   if (!rate) return "0.0";

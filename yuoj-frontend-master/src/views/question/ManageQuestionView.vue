@@ -96,7 +96,7 @@ const columns = [
     dataIndex: "submitNum",
   },
   {
-    title: "通过数",
+    title: "成功提交数",
     dataIndex: "acceptedNum",
   },
   {
