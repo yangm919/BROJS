@@ -72,7 +72,7 @@ codesandbox:
     base-url: https://judge0-ce.p.rapidapi.com
     rapidapi-key: 087d919e2dmshf5f3c038d699943p1fb696jsnf1a52bbb84b2
     rapidapi-host: judge0-ce.p.rapidapi.com
-    timeout: 30
-    max-retries: 30
+    timeout: 60
+    max-retries: 60
 knife4j:
   enable: true

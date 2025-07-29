@@ -114,7 +114,7 @@ let form = ref({
   answer: "",
   content: "",
   judgeConfig: {
-    memoryLimit: 1000,
+    memoryLimit: 50000,
     stackLimit: 1000,
     timeLimit: 1000,
   },
@@ -152,7 +152,7 @@ const loadData = async () => {
     }
     if (!form.value.judgeConfig) {
       form.value.judgeConfig = {
-        memoryLimit: 1000,
+        memoryLimit: 50000,
         stackLimit: 1000,
         timeLimit: 1000,
       };

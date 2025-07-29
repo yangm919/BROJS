@@ -12,7 +12,7 @@ public class JudgeConfig {
     /**
      * 内存限制（KB）
      */
-    private Long memoryLimit;
+    private Long memoryLimit = 50000L;
     /**
      * 堆栈限制（KB）
      */

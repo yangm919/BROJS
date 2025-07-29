@@ -49,7 +49,14 @@ public class JavaLanguageJudgeStrategy implements JudgeStrategy {
         JudgeConfig judgeConfig = JSONUtil.toBean(judgeConfigStr, JudgeConfig.class);
         Long needMemoryLimit = judgeConfig.getMemoryLimit();
         Long needTimeLimit = judgeConfig.getTimeLimit();
+        
+        System.out.println("=== 内存检查调试信息 ===");
+        System.out.println("实际内存使用: " + memory + " KB");
+        System.out.println("题目内存限制: " + needMemoryLimit + " KB");
+        System.out.println("内存比较结果: " + memory + " > " + needMemoryLimit + " = " + (memory > needMemoryLimit));
+        
         if (memory > needMemoryLimit) {
+            System.out.println("内存超限！");
             judgeInfoMessageEnum = JudgeInfoMessageEnum.MEMORY_LIMIT_EXCEEDED;
             judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
             return judgeInfoResponse;

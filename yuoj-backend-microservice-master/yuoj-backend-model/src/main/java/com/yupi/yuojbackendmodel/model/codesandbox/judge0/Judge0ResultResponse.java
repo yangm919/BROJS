@@ -1,5 +1,6 @@
 package com.yupi.yuojbackendmodel.model.codesandbox.judge0;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,14 +20,9 @@ public class Judge0ResultResponse {
     private String token;
     
     /**
-     * 状态ID
+     * 状态对象
      */
-    private Integer status_id;
-    
-    /**
-     * 状态描述
-     */
-    private String status_description;
+    private Judge0Status status;
     
     /**
      * 标准输出
@@ -41,6 +37,7 @@ public class Judge0ResultResponse {
     /**
      * 编译输出
      */
+    @JsonProperty("compile_output")
     private String compile_output;
     
     /**
@@ -51,7 +48,7 @@ public class Judge0ResultResponse {
     /**
      * 时间（秒）
      */
-    private Double time;
+    private String time;
     
     /**
      * 内存（KB）
@@ -61,10 +58,31 @@ public class Judge0ResultResponse {
     /**
      * 退出代码
      */
+    @JsonProperty("exit_code")
     private Integer exit_code;
     
     /**
      * 退出信号
      */
+    @JsonProperty("exit_signal")
     private Integer exit_signal;
+    
+    /**
+     * Judge0状态内部类
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Judge0Status {
+        /**
+         * 状态ID
+         */
+        private Integer id;
+        
+        /**
+         * 状态描述
+         */
+        private String description;
+    }
 } 

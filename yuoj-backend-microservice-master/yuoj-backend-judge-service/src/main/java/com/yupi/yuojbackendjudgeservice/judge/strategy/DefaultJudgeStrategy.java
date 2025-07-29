@@ -5,10 +5,12 @@ import com.yupi.yuojbackendmodel.model.dto.question.JudgeCase;
 import com.yupi.yuojbackendmodel.model.dto.question.JudgeConfig;
 import com.yupi.yuojbackendmodel.model.entity.Question;
 import com.yupi.yuojbackendmodel.model.enums.JudgeInfoMessageEnum;
+import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 /**
  * 默认判题策略
  */
+@Slf4j
 public class DefaultJudgeStrategy implements JudgeStrategy {
     /**
      * 执行判题
@@ -28,36 +30,54 @@ public class DefaultJudgeStrategy implements JudgeStrategy {
         JudgeInfo judgeInfoResponse = new JudgeInfo();
         judgeInfoResponse.setMemory(memory);
         judgeInfoResponse.setTime(time);
-        // 先判断沙箱执行的结果输出数量是否和预期输出数量相等
-        if (outputList.size() != inputList.size()) {
+        
+        log.info("开始判题 - 输入数量: {}, 输出数量: {}, 测试用例数量: {}", 
+                inputList.size(), outputList.size(), judgeCaseList.size());
+        
+        // 检查是否有输出结果
+        if (outputList.isEmpty()) {
+            log.warn("没有输出结果");
             judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
             judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
             return judgeInfoResponse;
         }
-        // 依次判断每一项输出和预期输出是否相等
-        for (int i = 0; i < judgeCaseList.size(); i++) {
-            JudgeCase judgeCase = judgeCaseList.get(i);
-            if (!judgeCase.getOutput().equals(outputList.get(i))) {
+        
+        // 对于Judge0，我们只处理第一个测试用例
+        if (!judgeCaseList.isEmpty() && !outputList.isEmpty()) {
+            JudgeCase judgeCase = judgeCaseList.get(0);
+            String expectedOutput = judgeCase.getOutput().trim();
+            String actualOutput = outputList.get(0).trim();
+            
+            log.info("比较输出 - 期望: '{}', 实际: '{}'", expectedOutput, actualOutput);
+            
+            // 比较输出结果
+            if (!expectedOutput.equals(actualOutput)) {
+                log.warn("输出不匹配 - 期望: '{}', 实际: '{}'", expectedOutput, actualOutput);
                 judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
                 judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
                 return judgeInfoResponse;
             }
         }
+        
         // 判断题目限制
         String judgeConfigStr = question.getJudgeConfig();
         JudgeConfig judgeConfig = JSONUtil.toBean(judgeConfigStr, JudgeConfig.class);
         Long needMemoryLimit = judgeConfig.getMemoryLimit();
         Long needTimeLimit = judgeConfig.getTimeLimit();
         if (memory > needMemoryLimit) {
+            log.warn("内存超限 - 使用: {}, 限制: {}", memory, needMemoryLimit);
             judgeInfoMessageEnum = JudgeInfoMessageEnum.MEMORY_LIMIT_EXCEEDED;
             judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
             return judgeInfoResponse;
         }
         if (time > needTimeLimit) {
+            log.warn("时间超限 - 使用: {}, 限制: {}", time, needTimeLimit);
             judgeInfoMessageEnum = JudgeInfoMessageEnum.TIME_LIMIT_EXCEEDED;
             judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
             return judgeInfoResponse;
         }
+        
+        log.info("判题成功");
         judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
         return judgeInfoResponse;
     }
