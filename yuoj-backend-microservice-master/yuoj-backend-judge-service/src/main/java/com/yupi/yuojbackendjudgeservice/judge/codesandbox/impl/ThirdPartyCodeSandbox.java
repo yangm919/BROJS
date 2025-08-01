@@ -64,6 +64,9 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
                 return createErrorResponse("没有测试用例");
             }
             
+            // 保存最后一个测试用例的结果，用于提取内存和时间信息
+            Judge0ResultResponse lastResult = null;
+            
             // 为每个测试用例执行代码
             for (int i = 0; i < inputList.size(); i++) {
                 String input = inputList.get(i);
@@ -80,6 +83,9 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
                 if (result == null) {
                     return createErrorResponse("获取执行结果失败");
                 }
+                
+                // 保存最后一个结果
+                lastResult = result;
                 
                 // 3. 处理单个测试用例的结果
                 String output = processSingleResult(result);
@@ -101,12 +107,32 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
                 }
             }
             
-            // 4. 构建最终响应
+            // 4. 构建最终响应 - 使用最后一个测试用例的内存和时间信息
+            JudgeInfo finalJudgeInfo = new JudgeInfo();
+            if (lastResult != null) {
+                finalJudgeInfo.setMemory(lastResult.getMemory() != null ? lastResult.getMemory().longValue() : 0L);
+                if (lastResult.getTime() != null) {
+                    try {
+                        finalJudgeInfo.setTime((long)(Double.parseDouble(lastResult.getTime()) * 1000)); // 转换为毫秒
+                    } catch (NumberFormatException e) {
+                        log.warn("无法解析时间字段: {}", lastResult.getTime());
+                        finalJudgeInfo.setTime(0L);
+                    }
+                } else {
+                    finalJudgeInfo.setTime(0L);
+                }
+                finalJudgeInfo.setMessage("执行成功");
+            } else {
+                finalJudgeInfo.setMemory(0L);
+                finalJudgeInfo.setTime(0L);
+                finalJudgeInfo.setMessage("执行成功");
+            }
+            
             return ExecuteCodeResponse.builder()
                     .outputList(outputList)
                     .message("执行成功")
                     .status(0)
-                    .judgeInfo(new JudgeInfo())
+                    .judgeInfo(finalJudgeInfo)
                     .build();
             
         } catch (Exception e) {
@@ -241,7 +267,13 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
                         // 状态ID 1-2 表示正在处理，3-9 表示已完成
                         if (result.getStatus().getId() >= 3) {
                             log.info("代码执行完成，状态：{}", result.getStatus().getDescription());
-                            return result;
+                            // 检查是否包含内存和时间信息
+                            if (result.getMemory() != null && result.getTime() != null) {
+                                log.info("获取到完整结果，内存：{}，时间：{}", result.getMemory(), result.getTime());
+                                return result;
+                            } else {
+                                log.info("结果不完整，内存：{}，时间：{}，继续等待...", result.getMemory(), result.getTime());
+                            }
                         } else {
                             log.info("代码正在处理中，状态：{}", result.getStatus().getDescription());
                         }
