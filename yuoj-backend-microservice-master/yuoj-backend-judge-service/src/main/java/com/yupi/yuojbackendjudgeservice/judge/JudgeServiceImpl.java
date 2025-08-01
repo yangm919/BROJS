@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 public class JudgeServiceImpl implements JudgeService {
     @Resource
@@ -83,7 +85,8 @@ public class JudgeServiceImpl implements JudgeService {
         questionSubmitUpdate.setId(questionSubmitId);
         // 根据判题结果设置状态
         String judgeMessage = judgeInfo.getMessage();
-        if ("执行成功".equals(judgeMessage)) {
+        log.info("judgeMessage: {}", judgeMessage);
+        if ("Accepted".equals(judgeMessage)) {
             questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEED.getValue());
         } else {
             questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.FAILED.getValue());

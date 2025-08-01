@@ -5,12 +5,12 @@ module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:8101',
+      "/api": {
+        target: "http://localhost:8101",
         changeOrigin: true,
-        secure: false
-      }
-    }
+        secure: false,
+      },
+    },
   },
   chainWebpack(config) {
     config.plugin("monaco").use(new MonacoWebpackPlugin());

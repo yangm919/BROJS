@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: yuoj-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - yuoj-network
+
+  redis:
+    image: redis:6
+    container_name: yuoj-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - yuoj-network
+
+  rabbitmq:
+    image: rabbitmq:3.12.6-management
+    container_name: yuoj-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - yuoj-network
+
+  nacos:
+    image: nacos/nacos-server:v2.2.0-slim
+    container_name: yuoj-nacos
+    ports:
+      - "8848:8848"
+    volumes:
+      - nacos-data:/home/nacos/data
+    environment:
+      - MODE=standalone
+      - PREFER_HOST_MODE=hostname
+      - TZ=Asia/Shanghai
+    networks:
+      - yuoj-network
+
+  gateway:
+    build: .
+    container_name: yuoj-gateway
+    ports:
+      - "8101:8101"
+    environment:
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=yuoj-nacos:8848
+      - SPRING_DATASOURCE_URL=jdbc:mysql://yuoj-mysql:3306/yuoj
+      - SPRING_REDIS_HOST=yuoj-redis
+      - SPRING_RABBITMQ_HOST=yuoj-rabbitmq
+    command: ["java", "-jar", "gateway.jar"]
+    depends_on:
+      - nacos
+      - mysql
+      - redis
+      - rabbitmq
+    networks:
+      - yuoj-network
+
+  user-service:
+    build: .
+    container_name: yuoj-user-service
+    ports:
+      - "8102:8102"
+    environment:
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=yuoj-nacos:8848
+      - SPRING_DATASOURCE_URL=jdbc:mysql://yuoj-mysql:3306/yuoj
+      - SPRING_REDIS_HOST=yuoj-redis
+      - SPRING_RABBITMQ_HOST=yuoj-rabbitmq
+      - SERVER_PORT=8102
+    command: ["java", "-jar", "user-service.jar"]
+    depends_on:
+      - gateway
+    networks:
+      - yuoj-network
+
+  question-service:
+    build: .
+    container_name: yuoj-question-service
+    ports:
+      - "8103:8103"
+    environment:
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=yuoj-nacos:8848
+      - SPRING_DATASOURCE_URL=jdbc:mysql://yuoj-mysql:3306/yuoj
+      - SPRING_REDIS_HOST=yuoj-redis
+      - SPRING_RABBITMQ_HOST=yuoj-rabbitmq
+      - SERVER_PORT=8103
+    command: ["java", "-jar", "question-service.jar"]
+    depends_on:
+      - user-service
+    networks:
+      - yuoj-network
+
+  judge-service:
+    build: .
+    container_name: yuoj-judge-service
+    ports:
+      - "8104:8104"
+    environment:
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=yuoj-nacos:8848
+      - SPRING_DATASOURCE_URL=jdbc:mysql://yuoj-mysql:3306/yuoj
+      - SPRING_REDIS_HOST=yuoj-redis
+      - SPRING_RABBITMQ_HOST=yuoj-rabbitmq
+      - SERVER_PORT=8104
+    command: ["java", "-jar", "judge-service.jar"]
+    depends_on:
+      - question-service
+    networks:
+      - yuoj-network
+
+volumes:
+  mysql-data:
+  redis-data:
+  rabbitmq-data:
+  nacos-data:
+
+networks:
+  yuoj-network:
+    driver: bridge 

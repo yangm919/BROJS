@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8101:8101"
+    environment:
+      - NACOS_HOST=yuoj-nacos
     networks:
       - mynetwork
 
@@ -17,6 +19,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8102:8102"
+    environment:
+      - NACOS_HOST=yuoj-nacos
     networks:
       - mynetwork
     depends_on:
@@ -29,6 +33,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8103:8103"
+    environment:
+      - NACOS_HOST=yuoj-nacos
     networks:
       - mynetwork
     depends_on:
@@ -42,6 +48,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8104:8104"
+    environment:
+      - NACOS_HOST=yuoj-nacos
     networks:
       - mynetwork
     depends_on:

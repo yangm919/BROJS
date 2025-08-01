@@ -42,17 +42,25 @@ public class DefaultJudgeStrategy implements JudgeStrategy {
             return judgeInfoResponse;
         }
         
-        // 对于Judge0，我们只处理第一个测试用例
-        if (!judgeCaseList.isEmpty() && !outputList.isEmpty()) {
-            JudgeCase judgeCase = judgeCaseList.get(0);
+        // 检查输出数量是否匹配
+        if (outputList.size() != judgeCaseList.size()) {
+            log.warn("输出数量不匹配 - 期望: {}, 实际: {}", judgeCaseList.size(), outputList.size());
+            judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
+            judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
+            return judgeInfoResponse;
+        }
+        
+        // 处理所有测试用例
+        for (int i = 0; i < judgeCaseList.size(); i++) {
+            JudgeCase judgeCase = judgeCaseList.get(i);
             String expectedOutput = judgeCase.getOutput().trim();
-            String actualOutput = outputList.get(0).trim();
+            String actualOutput = outputList.get(i).trim();
             
-            log.info("比较输出 - 期望: '{}', 实际: '{}'", expectedOutput, actualOutput);
+            log.info("比较第{}个测试用例 - 期望: '{}', 实际: '{}'", i + 1, expectedOutput, actualOutput);
             
             // 比较输出结果
             if (!expectedOutput.equals(actualOutput)) {
-                log.warn("输出不匹配 - 期望: '{}', 实际: '{}'", expectedOutput, actualOutput);
+                log.warn("第{}个测试用例输出不匹配 - 期望: '{}', 实际: '{}'", i + 1, expectedOutput, actualOutput);
                 judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
                 judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
                 return judgeInfoResponse;
