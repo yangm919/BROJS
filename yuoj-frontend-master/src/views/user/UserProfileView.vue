@@ -2,13 +2,13 @@
   <div id="userProfileView">
     <div class="profile-container">
       <div class="profile-header">
-        <h2 class="title">个人信息</h2>
-        <p class="subtitle">查看您的学习统计和成就</p>
+        <h2 class="title">Personal Information</h2>
+        <p class="subtitle">View your learning statistics and achievements</p>
       </div>
 
       <div class="profile-content">
-        <!-- 用户基本信息 -->
-        <a-card class="user-info-card" title="基本信息">
+        <!-- User basic information -->
+        <a-card class="user-info-card" title="Basic Information">
           <div class="user-info">
             <div class="avatar-section">
               <a-avatar :size="80" :src="userInfo.userAvatar">
@@ -16,56 +16,56 @@
               </a-avatar>
             </div>
             <div class="info-section">
-              <h3>{{ userInfo.userName || "用户" }}</h3>
+              <h3>{{ userInfo.userName || "User" }}</h3>
               <p class="user-role">{{ getRoleText(userInfo.userRole) }}</p>
               <p class="join-date">
-                加入时间：{{ formatDate(userInfo.createTime) }}
+                Join time: {{ formatDate(userInfo.createTime) }}
               </p>
             </div>
           </div>
         </a-card>
 
-        <!-- 统计信息 -->
-        <a-card class="statistics-card" title="学习统计">
+        <!-- Statistics information -->
+        <a-card class="statistics-card" title="Learning Statistics">
           <div class="statistics-grid">
             <div class="stat-item">
               <div class="stat-number">
                 {{ statistics.totalSubmissions || 0 }}
               </div>
-              <div class="stat-label">提交题目总数</div>
+              <div class="stat-label">Total Submissions</div>
             </div>
             <div class="stat-item">
               <div class="stat-number">
                 {{ statistics.totalQuestions || 0 }}
               </div>
-              <div class="stat-label">做题数量</div>
+              <div class="stat-label">Questions Solved</div>
             </div>
             <div class="stat-item">
               <div class="stat-number">
                 {{ statistics.acceptedSubmissions || 0 }}
               </div>
-              <div class="stat-label">成功提交数</div>
+              <div class="stat-label">Accepted Submissions</div>
             </div>
             <div class="stat-item">
               <div class="stat-number">
                 {{ formatRate(statistics.acceptanceRate) }}%
               </div>
-              <div class="stat-label">提交成功率</div>
+              <div class="stat-label">Acceptance Rate</div>
             </div>
             <div class="stat-item">
               <div class="stat-number">
                 {{ statistics.createdQuestions || 0 }}
               </div>
-              <div class="stat-label">创建题目数</div>
+              <div class="stat-label">Questions Created</div>
             </div>
           </div>
         </a-card>
 
-        <!-- 操作按钮 -->
+        <!-- Action buttons -->
         <div class="actions">
           <a-button type="primary" @click="goBack">
             <icon-arrow-left />
-            返回
+            Back
           </a-button>
         </div>
       </div>
@@ -85,7 +85,7 @@ import { UserControllerService, UserStatisticsVO } from "../../../generated";
 const router = useRouter();
 const store = useStore();
 
-// 用户信息
+// User information
 const userInfo = ref({
   userName: "",
   userRole: "",
@@ -93,7 +93,7 @@ const userInfo = ref({
   createTime: "",
 });
 
-// 统计信息
+// Statistics information
 const statistics = ref<UserStatisticsVO>({
   totalSubmissions: 0,
   totalQuestions: 0,
@@ -103,29 +103,29 @@ const statistics = ref<UserStatisticsVO>({
 });
 
 /**
- * 获取角色文本
+ * Get role text
  */
 const getRoleText = (role: string) => {
   switch (role) {
     case "admin":
-      return "管理员";
+      return "Administrator";
     case "user":
-      return "普通用户";
+      return "Regular User";
     default:
-      return "用户";
+      return "User";
   }
 };
 
 /**
- * 格式化日期
+ * Format date
  */
 const formatDate = (date: string) => {
-  if (!date) return "未知";
-  return moment(date).format("YYYY年MM月DD日");
+  if (!date) return "Unknown";
+  return moment(date).format("YYYY-MM-DD");
 };
 
 /**
- * 格式化提交成功率
+ * Format acceptance rate
  */
 const formatRate = (rate: number | undefined) => {
   if (!rate) return "0.0";
@@ -133,7 +133,7 @@ const formatRate = (rate: number | undefined) => {
 };
 
 /**
- * 加载用户统计信息
+ * Load user statistics
  */
 const loadUserStatistics = async () => {
   try {
@@ -141,22 +141,24 @@ const loadUserStatistics = async () => {
     if (res.code === 0 && res.data) {
       statistics.value = res.data;
     } else {
-      message.error("获取统计信息失败：" + (res.message || "未知错误"));
+      message.error(
+        "Failed to get statistics: " + (res.message || "Unknown error")
+      );
     }
   } catch (error) {
-    console.error("获取统计信息失败:", error);
-    message.error("获取统计信息失败");
+    console.error("Failed to get statistics:", error);
+    message.error("Failed to get statistics");
   }
 };
 
 /**
- * 加载用户信息
+ * Load user information
  */
 const loadUserInfo = () => {
   const loginUser = store.state.user.loginUser;
   if (loginUser) {
     userInfo.value = {
-      userName: loginUser.userName || "用户",
+      userName: loginUser.userName || "User",
       userRole: loginUser.userRole || "user",
       userAvatar: loginUser.userAvatar || "",
       createTime: loginUser.createTime || "",
@@ -165,7 +167,7 @@ const loadUserInfo = () => {
 };
 
 /**
- * 返回上一页
+ * Go back to previous page
  */
 const goBack = () => {
   router.go(-1);

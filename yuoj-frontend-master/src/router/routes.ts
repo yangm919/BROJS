@@ -16,17 +16,17 @@ import ViewQuestionView from "@/views/question/ViewQuestionView.vue";
 export const routes: Array<RouteRecordRaw> = [
   {
     path: "/user",
-    name: "用户",
+    name: "User",
     component: UserLayout,
     children: [
       {
         path: "/user/login",
-        name: "用户登录",
+        name: "User Login",
         component: UserLoginView,
       },
       {
         path: "/user/register",
-        name: "用户注册",
+        name: "User Register",
         component: UserRegisterView,
       },
     ],
@@ -36,20 +36,20 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/questions",
-    name: "浏览题目",
+    name: "Browse Questions",
     component: QuestionsView,
   },
   {
     path: "/question_submit",
-    name: "浏览题目提交",
+    name: "Browse Question Submissions",
     component: QuestionSubmitView,
     meta: {
       access: ACCESS_ENUM.USER,
     },
   },
   {
-    path: "/view/question/:id",
-    name: "在线做题",
+    path: "/question/view/:id",
+    name: "Online Problem Solving",
     component: ViewQuestionView,
     props: true,
     meta: {
@@ -59,7 +59,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/add/question",
-    name: "创建题目",
+    name: "Create Question",
     component: AddQuestionView,
     meta: {
       access: ACCESS_ENUM.USER,
@@ -67,7 +67,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/update/question",
-    name: "更新题目",
+    name: "Update Question",
     component: AddQuestionView,
     meta: {
       access: ACCESS_ENUM.USER,
@@ -76,7 +76,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/manage/question/",
-    name: "管理题目",
+    name: "Manage Questions",
     component: ManageQuestionView,
     meta: {
       access: ACCESS_ENUM.ADMIN,
@@ -84,7 +84,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/profile",
-    name: "个人信息",
+    name: "Personal Information",
     component: UserProfileView,
     meta: {
       access: ACCESS_ENUM.USER,
@@ -93,12 +93,12 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/",
-    name: "主页",
+    name: "Home",
     component: QuestionsView,
   },
   // {
   //   path: "/hide",
-  //   name: "隐藏页面",
+  //   name: "Hidden Page",
   //   component: HomeView,
   //   meta: {
   //     hideInMenu: true,
@@ -106,7 +106,7 @@ export const routes: Array<RouteRecordRaw> = [
   // },
   {
     path: "/noAuth",
-    name: "无权限",
+    name: "No Permission",
     component: NoAuthView,
     meta: {
       hideInMenu: true,
@@ -114,7 +114,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   // {
   //   path: "/admin",
-  //   name: "管理员可见",
+  //   name: "Admin Visible",
   //   component: AdminView,
   //   meta: {
   //     access: ACCESS_ENUM.ADMIN,
@@ -122,7 +122,7 @@ export const routes: Array<RouteRecordRaw> = [
   // },
   // {
   //   path: "/about",
-  //   name: "关于我的",
+  //   name: "About Me",
   //   // route level code-splitting
   //   // this generates a separate chunk (about.[hash].js) for this route
   //   // which is lazy-loaded when the route is visited.

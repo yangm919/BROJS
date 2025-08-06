@@ -95,172 +95,172 @@ mkdir backend frontend nginx-config
 
 ## 4. 数据库初始化
 
-### 4.1 数据库初始化概述
+### 4.1 Database Initialization Overview
 
-在线判题系统需要以下数据库组件：
-- **MySQL**: 主数据库，存储用户、题目、提交记录等
-- **Redis**: 缓存和会话存储
-- **RabbitMQ**: 消息队列，用于异步判题
+The Online Judge System requires the following database components:
+- **MySQL**: Main database, stores users, questions, submission records, etc.
+- **Redis**: Cache and session storage
+- **RabbitMQ**: Message queue, used for asynchronous judging
 
-### 4.2 准备数据库初始化脚本
+### 4.2 Prepare Database Initialization Scripts
 
-#### 4.2.1 本地准备初始化文件
+#### 4.2.1 Prepare Initialization Files Locally
 
-在本地项目根目录创建数据库初始化文件：
+Create database initialization files in the local project root directory:
 
 ```bash
-# 创建数据库初始化目录
+# Create database initialization directory
 mkdir -p backend/mysql-init
 
-# 复制初始化脚本
+# Copy initialization script
 cp yuoj-backend-microservice-master/mysql-init/init-docker.sql backend/mysql-init/
 ```
 
-#### 4.2.2 创建数据库初始化配置
+#### 4.2.2 Create Database Initialization Configuration
 
-在本地创建 `backend/mysql-init/init.sql`：
+Create `backend/mysql-init/init.sql` locally:
 
 ```sql
--- 数据库初始化脚本
+-- Database initialization script
 CREATE DATABASE IF NOT EXISTS `yuoj` 
 CHARACTER SET utf8mb4 
 COLLATE utf8mb4_unicode_ci;
 
 USE `yuoj`;
 
--- 用户表
+-- User table
 CREATE TABLE IF NOT EXISTS `user` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '用户ID' PRIMARY KEY,
-    `userAccount` VARCHAR(256) NOT NULL COMMENT '用户账号',
-    `userPassword` VARCHAR(512) NOT NULL COMMENT '用户密码',
-    `unionId` VARCHAR(256) NULL COMMENT '微信开放平台ID',
-    `mpOpenId` VARCHAR(256) NULL COMMENT '公众号openId',
-    `userName` VARCHAR(256) NULL COMMENT '用户昵称',
-    `userAvatar` VARCHAR(1024) NULL COMMENT '用户头像',
-    `userProfile` VARCHAR(512) NULL COMMENT '用户简介',
-    `userRole` VARCHAR(256) DEFAULT 'user' NOT NULL COMMENT '用户角色：user/admin/ban',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT '是否删除',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'User ID' PRIMARY KEY,
+    `userAccount` VARCHAR(256) NOT NULL COMMENT 'User account',
+    `userPassword` VARCHAR(512) NOT NULL COMMENT 'User password',
+    `unionId` VARCHAR(256) NULL COMMENT 'WeChat Open Platform ID',
+    `mpOpenId` VARCHAR(256) NULL COMMENT 'WeChat Official Account openId',
+    `userName` VARCHAR(256) NULL COMMENT 'User nickname',
+    `userAvatar` VARCHAR(1024) NULL COMMENT 'User avatar',
+    `userProfile` VARCHAR(512) NULL COMMENT 'User profile',
+    `userRole` VARCHAR(256) DEFAULT 'user' NOT NULL COMMENT 'User role: user/admin/ban',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT 'Is deleted',
     INDEX `idx_unionId` (`unionId`),
     INDEX `idx_userAccount` (`userAccount`),
     INDEX `idx_userRole` (`userRole`)
-) COMMENT '用户表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'User table' COLLATE = utf8mb4_unicode_ci;
 
--- 题目表
+-- Question table
 CREATE TABLE IF NOT EXISTS `question` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '题目ID' PRIMARY KEY,
-    `title` VARCHAR(512) NULL COMMENT '题目标题',
-    `content` TEXT NULL COMMENT '题目内容',
-    `tags` VARCHAR(1024) NULL COMMENT '标签列表（json 数组）',
-    `answer` TEXT NULL COMMENT '题目答案',
-    `submitNum` INT DEFAULT 0 NOT NULL COMMENT '题目提交数',
-    `acceptedNum` INT DEFAULT 0 NOT NULL COMMENT '题目通过数',
-    `judgeCase` TEXT NULL COMMENT '判题用例（json 数组）',
-    `judgeConfig` TEXT NULL COMMENT '判题配置（json 对象）',
-    `thumbNum` INT DEFAULT 0 NOT NULL COMMENT '点赞数',
-    `favourNum` INT DEFAULT 0 NOT NULL COMMENT '收藏数',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT '是否删除',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Question ID' PRIMARY KEY,
+    `title` VARCHAR(512) NULL COMMENT 'Question title',
+    `content` TEXT NULL COMMENT 'Question content',
+    `tags` VARCHAR(1024) NULL COMMENT 'Tags list (json array)',
+    `answer` TEXT NULL COMMENT 'Question answer',
+    `submitNum` INT DEFAULT 0 NOT NULL COMMENT 'Submit count',
+    `acceptedNum` INT DEFAULT 0 NOT NULL COMMENT 'Accepted count',
+    `judgeCase` TEXT NULL COMMENT 'Judge cases (json array)',
+    `judgeConfig` TEXT NULL COMMENT 'Judge configuration (json object)',
+    `thumbNum` INT DEFAULT 0 NOT NULL COMMENT 'Thumb count',
+    `favourNum` INT DEFAULT 0 NOT NULL COMMENT 'Favour count',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT 'Is deleted',
     INDEX `idx_userId` (`userId`),
     INDEX `idx_title` (`title`),
     INDEX `idx_createTime` (`createTime`)
-) COMMENT '题目表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Question table' COLLATE = utf8mb4_unicode_ci;
 
--- 题目提交表
+-- Question submit table
 CREATE TABLE IF NOT EXISTS `question_submit` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '提交ID' PRIMARY KEY,
-    `language` VARCHAR(128) NOT NULL COMMENT '编程语言',
-    `code` TEXT NOT NULL COMMENT '用户代码',
-    `judgeInfo` TEXT NULL COMMENT '判题信息（json 对象）',
-    `status` INT DEFAULT 0 NOT NULL COMMENT '判题状态（0 - 待判题、1 - 判题中、2 - 成功、3 - 失败）',
-    `questionId` BIGINT NOT NULL COMMENT '题目ID',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT '是否删除',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Submit ID' PRIMARY KEY,
+    `language` VARCHAR(128) NOT NULL COMMENT 'Programming language',
+    `code` TEXT NOT NULL COMMENT 'User code',
+    `judgeInfo` TEXT NULL COMMENT 'Judge information (json object)',
+    `status` INT DEFAULT 0 NOT NULL COMMENT 'Judge status (0 - pending, 1 - judging, 2 - success, 3 - failed)',
+    `questionId` BIGINT NOT NULL COMMENT 'Question ID',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT 'Is deleted',
     INDEX `idx_questionId` (`questionId`),
     INDEX `idx_userId` (`userId`),
     INDEX `idx_status` (`status`),
     INDEX `idx_createTime` (`createTime`)
-) COMMENT '题目提交表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Question submit table' COLLATE = utf8mb4_unicode_ci;
 
--- 帖子表
+-- Post table
 CREATE TABLE IF NOT EXISTS `post` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '帖子ID' PRIMARY KEY,
-    `title` VARCHAR(512) NULL COMMENT '帖子标题',
-    `content` TEXT NULL COMMENT '帖子内容',
-    `tags` VARCHAR(1024) NULL COMMENT '标签列表（json 数组）',
-    `thumbNum` INT DEFAULT 0 NOT NULL COMMENT '点赞数',
-    `favourNum` INT DEFAULT 0 NOT NULL COMMENT '收藏数',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT '是否删除',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Post ID' PRIMARY KEY,
+    `title` VARCHAR(512) NULL COMMENT 'Post title',
+    `content` TEXT NULL COMMENT 'Post content',
+    `tags` VARCHAR(1024) NULL COMMENT 'Tags list (json array)',
+    `thumbNum` INT DEFAULT 0 NOT NULL COMMENT 'Thumb count',
+    `favourNum` INT DEFAULT 0 NOT NULL COMMENT 'Favour count',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT 'Is deleted',
     INDEX `idx_userId` (`userId`),
     INDEX `idx_title` (`title`),
     INDEX `idx_createTime` (`createTime`)
-) COMMENT '帖子表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Post table' COLLATE = utf8mb4_unicode_ci;
 
--- 帖子点赞表
+-- Post thumb table
 CREATE TABLE IF NOT EXISTS `post_thumb` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '点赞ID' PRIMARY KEY,
-    `postId` BIGINT NOT NULL COMMENT '帖子ID',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Thumb ID' PRIMARY KEY,
+    `postId` BIGINT NOT NULL COMMENT 'Post ID',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     INDEX `idx_postId` (`postId`),
     INDEX `idx_userId` (`userId`),
     UNIQUE KEY `uk_post_user` (`postId`, `userId`)
-) COMMENT '帖子点赞表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Post thumb table' COLLATE = utf8mb4_unicode_ci;
 
--- 帖子收藏表
+-- Post favour table
 CREATE TABLE IF NOT EXISTS `post_favour` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '收藏ID' PRIMARY KEY,
-    `postId` BIGINT NOT NULL COMMENT '帖子ID',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Favour ID' PRIMARY KEY,
+    `postId` BIGINT NOT NULL COMMENT 'Post ID',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     INDEX `idx_postId` (`postId`),
     INDEX `idx_userId` (`userId`),
     UNIQUE KEY `uk_post_user` (`postId`, `userId`)
-) COMMENT '帖子收藏表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Post favour table' COLLATE = utf8mb4_unicode_ci;
 
--- 插入初始数据
+-- Insert initial data
 INSERT INTO `user` (`userAccount`, `userPassword`, `userName`, `userRole`, `userProfile`) VALUES
-('admin', '03caebb36670995fc5e097d0d8a6f908', '管理员', 'admin', '系统管理员'),
-('test', '03caebb36670995fc5e097d0d8a6f908', '测试用户', 'user', '测试用户账号');
+('admin', '03caebb36670995fc5e097d0d8a6f908', 'Administrator', 'admin', 'System Administrator'),
+('test', '03caebb36670995fc5e097d0d8a6f908', 'Test User', 'user', 'Test user account');
 
--- 插入示例题目
+-- Insert sample question
 INSERT INTO `question` (`title`, `content`, `tags`, `answer`, `judgeCase`, `judgeConfig`, `userId`) VALUES
-('两数之和', 
-'给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出和为目标值 target 的那两个整数，并返回它们的数组下标。
+('Two Sum', 
+'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
 
-你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
 
-你可以按任意顺序返回答案。
+You can return the answer in any order.
 
-示例 1：
-输入：nums = [2,7,11,15], target = 9
-输出：[0,1]
-解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。
+Example 1:
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
 
-示例 2：
-输入：nums = [3,2,4], target = 6
-输出：[1,2]
+Example 2:
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
 
-示例 3：
-输入：nums = [3,3], target = 6
-输出：[0,1]
+Example 3:
+Input: nums = [3,3], target = 6
+Output: [0,1]
 
-提示：
+Constraints:
 2 <= nums.length <= 104
 -109 <= nums[i] <= 109
 -109 <= target <= 109
-只会存在一个有效答案', 
-'["数组", "哈希表"]', 
+Only one valid answer exists', 
+'["Array", "Hash Table"]', 
 '```java
 class Solution {
     public int[] twoSum(int[] nums, int target) {
@@ -280,63 +280,63 @@ class Solution {
 '{"timeLimit": 1000, "memoryLimit": 256000}', 
 1);
 
--- 插入示例帖子
+-- Insert sample post
 INSERT INTO `post` (`title`, `content`, `tags`, `userId`) VALUES
-('欢迎来到在线判题系统', 
-'欢迎使用我们的在线判题系统！这是一个功能强大的编程练习平台，支持多种编程语言。
+('Welcome to Online Judge System', 
+'Welcome to our Online Judge System! This is a powerful programming practice platform that supports multiple programming languages.
 
-主要功能：
-- 题目练习：提供各种难度的编程题目
-- 在线判题：实时编译和运行代码
-- 社区交流：分享解题思路和经验
-- 个人中心：查看做题记录和统计
+Main features:
+- Question practice: Provides programming questions of various difficulties
+- Online judging: Real-time code compilation and execution
+- Community communication: Share problem-solving ideas and experiences
+- Personal center: View problem-solving records and statistics
 
-开始你的编程之旅吧！', 
-'["欢迎", "介绍"]', 
+Start your programming journey now!', 
+'["Welcome", "Introduction"]', 
 1);
 ```
 
-### 4.3 传输数据库初始化文件
+### 4.3 Transfer Database Initialization Files
 
 ```bash
-# 传输数据库初始化文件到服务器
+# Transfer database initialization files to server
 scp -i ~/Downloads/enabled.pem -r backend/mysql-init/* ubuntu@4.213.48.226:/opt/yuoj-app/backend/mysql-init/
 ```
 
-### 4.4 在服务器上初始化数据库
+### 4.4 Initialize Database on Server
 
-#### 4.4.1 方法一：使用 Docker Compose（推荐）
+#### 4.4.1 Method 1: Using Docker Compose (Recommended)
 
 ```bash
-# SSH 连接到服务器
+# SSH connect to server
 ssh -i ~/Downloads/enabled.pem ubuntu@4.213.48.226
 
-# 进入应用目录
+# Enter application directory
 cd /opt/yuoj-app/backend
 
-# 启动数据库服务（仅启动数据库相关服务）
+# Start database services (only database-related services)
 docker-compose up -d mysql redis rabbitmq nacos
 
-# 等待数据库服务完全启动
+# Wait for database services to fully start
 sleep 30
 
-# 检查数据库服务状态
+# Check database service status
 docker-compose ps
 
-# 验证数据库连接
+# Verify database connection
 docker exec -it yuoj-mysql mysql -u root -p123456 -e "SHOW DATABASES;"
 ```
 
-#### 4.4.2 方法二：手动初始化数据库
+#### 4.4.2 Method 2: Manual Database Initialization
 
 ```bash
-# SSH 连接到服务器
+# SSH connect to server
 ssh -i ~/Downloads/enabled.pem ubuntu@4.213.48.226
 
-# 进入应用目录
+# Enter application directory
 cd /opt/yuoj-app/backend
 
-# 启动 MySQL 容器
+# Start MySQL container
 docker run -d \
   --name yuoj-mysql \
   --network yuoj-network \
@@ -347,115 +347,115 @@ docker run -d \
   -v /opt/yuoj-app/backend/mysql-init:/docker-entrypoint-initdb.d \
   mysql:8
 
-# 等待 MySQL 启动
+# Wait for MySQL to start
 sleep 60
 
-# 验证数据库初始化
+# Verify database initialization
 docker exec -it yuoj-mysql mysql -u root -p123456 -e "USE yuoj; SHOW TABLES;"
 ```
 
-### 4.5 验证数据库初始化
+### 4.5 Verify Database Initialization
 
 ```bash
-# 检查数据库表
+# Check database tables
 docker exec -it yuoj-mysql mysql -u root -p123456 -e "USE yuoj; SHOW TABLES;"
 
-# 检查初始数据
+# Check initial data
 docker exec -it yuoj-mysql mysql -u root -p123456 -e "USE yuoj; SELECT COUNT(*) as user_count FROM user;"
 docker exec -it yuoj-mysql mysql -u root -p123456 -e "USE yuoj; SELECT COUNT(*) as question_count FROM question;"
 docker exec -it yuoj-mysql mysql -u root -p123456 -e "USE yuoj; SELECT COUNT(*) as post_count FROM post;"
 
-# 检查用户数据
+# Check user data
 docker exec -it yuoj-mysql mysql -u root -p123456 -e "USE yuoj; SELECT userAccount, userName, userRole FROM user;"
 ```
 
-### 4.6 数据库配置说明
+### 4.6 Database Configuration
 
-#### 4.6.1 默认用户账号
+#### 4.6.1 Default User Accounts
 
-- **管理员账号**: `admin`
-- **管理员密码**: `12345678`
-- **测试账号**: `test`
-- **测试密码**: `12345678`
+- **Admin Account**: `admin`
+- **Admin Password**: `12345678`
+- **Test Account**: `test`
+- **Test Password**: `12345678`
 
-#### 4.6.2 数据库连接信息
+#### 4.6.2 Database Connection Information
 
-- **数据库名**: `yuoj`
-- **字符集**: `utf8mb4`
-- **排序规则**: `utf8mb4_unicode_ci`
-- **端口**: `3306`
-- **用户名**: `root`
-- **密码**: `123456`
+- **Database Name**: `yuoj`
+- **Character Set**: `utf8mb4`
+- **Collation**: `utf8mb4_unicode_ci`
+- **Port**: `3306`
+- **Username**: `root`
+- **Password**: `123456`
 
-#### 4.6.3 数据库表结构
+#### 4.6.3 Database Table Structure
 
-| 表名 | 说明 | 主要字段 |
-|------|------|----------|
-| `user` | 用户表 | id, userAccount, userPassword, userRole |
-| `question` | 题目表 | id, title, content, judgeCase, judgeConfig |
-| `question_submit` | 题目提交表 | id, language, code, status, questionId, userId |
-| `post` | 帖子表 | id, title, content, userId |
-| `post_thumb` | 帖子点赞表 | id, postId, userId |
-| `post_favour` | 帖子收藏表 | id, postId, userId |
+| Table Name | Description | Main Fields |
+|------------|-------------|-------------|
+| `user` | User table | id, userAccount, userPassword, userRole |
+| `question` | Question table | id, title, content, judgeCase, judgeConfig |
+| `question_submit` | Question submit table | id, language, code, status, questionId, userId |
+| `post` | Post table | id, title, content, userId |
+| `post_thumb` | Post thumb table | id, postId, userId |
+| `post_favour` | Post favour table | id, postId, userId |
 
-### 4.7 数据库备份和恢复
+### 4.7 Database Backup and Recovery
 
-#### 4.7.1 备份数据库
+#### 4.7.1 Backup Database
 
 ```bash
-# 备份整个数据库
+# Backup entire database
 docker exec yuoj-mysql mysqldump -u root -p123456 yuoj > yuoj_backup_$(date +%Y%m%d_%H%M%S).sql
 
-# 备份特定表
+# Backup specific tables
 docker exec yuoj-mysql mysqldump -u root -p123456 yuoj user question > tables_backup.sql
 ```
 
-#### 4.7.2 恢复数据库
+#### 4.7.2 Restore Database
 
 ```bash
-# 恢复数据库
+# Restore database
 docker exec -i yuoj-mysql mysql -u root -p123456 yuoj < yuoj_backup_20250101_120000.sql
 
-# 恢复特定表
+# Restore specific tables
 docker exec -i yuoj-mysql mysql -u root -p123456 yuoj < tables_backup.sql
 ```
 
-### 4.8 数据库维护
+### 4.8 Database Maintenance
 
-#### 4.8.1 定期备份脚本
+#### 4.8.1 Regular Backup Script
 
-创建备份脚本 `/opt/yuoj-app/backup-db.sh`：
+Create backup script `/opt/yuoj-app/backup-db.sh`:
 
 ```bash
 #!/bin/bash
 
-# 设置变量
+# Set variables
 BACKUP_DIR="/opt/yuoj-app/backups"
 DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="yuoj_backup_$DATE.sql"
 
-# 创建备份目录
+# Create backup directory
 mkdir -p $BACKUP_DIR
 
-# 执行备份
+# Execute backup
 docker exec yuoj-mysql mysqldump -u root -p123456 yuoj > $BACKUP_DIR/$BACKUP_FILE
 
-# 压缩备份文件
+# Compress backup file
 gzip $BACKUP_DIR/$BACKUP_FILE
 
-# 删除7天前的备份
+# Delete backups older than 7 days
 find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
 
-echo "数据库备份完成: $BACKUP_DIR/$BACKUP_FILE.gz"
+echo "Database backup completed: $BACKUP_DIR/$BACKUP_FILE.gz"
 ```
 
-#### 4.8.2 设置定时备份
+#### 4.8.2 Set Scheduled Backup
 
 ```bash
-# 编辑 crontab
+# Edit crontab
 crontab -e
 
-# 添加定时任务（每天凌晨2点备份）
+# Add scheduled task (backup at 2 AM daily)
 0 2 * * * /opt/yuoj-app/backup-db.sh
 ```
 

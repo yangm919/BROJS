@@ -2,25 +2,25 @@ package com.yupi.yuojbackendcommon.common;
 import lombok.Data;
 import com.yupi.yuojbackendcommon.constant.CommonConstant;
 /**
- * 分页请求
+ * Pagination request
  *
  */
 @Data
 public class PageRequest {
     /**
-     * 当前页号
+     * Current page number
      */
     private long current = 1;
     /**
-     * 页面大小
+     * Page size
      */
     private long pageSize = 10;
     /**
-     * 排序字段
+     * Sort field
      */
     private String sortField;
     /**
-     * 排序顺序（默认升序）
+     * Sort order (default ascending)
      */
     private String sortOrder = CommonConstant.SORT_ORDER_ASC;
 }

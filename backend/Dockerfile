@@ -1,4 +1,3 @@
-
 FROM openjdk:8-jdk-alpine
 
 WORKDIR /app
@@ -9,8 +8,9 @@ COPY yuoj-backend-user-service-0.0.1-SNAPSHOT.jar user-service.jar
 COPY yuoj-backend-question-service-0.0.1-SNAPSHOT.jar question-service.jar
 COPY yuoj-backend-judge-service-0.0.1-SNAPSHOT.jar judge-service.jar
 
-
+# 复制配置文件
+COPY application.yml application.yml
 
 EXPOSE 8101 8102 8103 8104
 
-CMD ["java", "-jar", "gateway.jar"]
+CMD ["java", "-jar"]

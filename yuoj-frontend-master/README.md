@@ -1,10 +1,10 @@
-# 鱼 OJ 前端项目
+# Br OJ Frontend Project
 
-## 项目简介
+## Project Introduction
 
-这是一个基于 Vue 3 + TypeScript 的在线编程评测系统前端项目。
+This is a Vue 3 + TypeScript based online programming evaluation system frontend project.
 
-## 技术栈
+## Technology Stack
 
 - Vue 3
 - TypeScript
@@ -13,67 +13,67 @@
 - Arco Design Vue
 - Axios
 
-## 鉴权机制
+## Authentication Mechanism
 
-### 权限级别
+### Permission Levels
 
-项目定义了三种权限级别：
+The project defines three permission levels:
 
-1. **NOT_LOGIN** - 无需登录即可访问
-2. **USER** - 需要用户登录
-3. **ADMIN** - 需要管理员权限
+1. **NOT_LOGIN** - Accessible without login
+2. **USER** - Requires user login
+3. **ADMIN** - Requires administrator privileges
 
-### 需要鉴权的页面
+### Pages Requiring Authentication
 
-以下页面需要用户登录才能访问：
+The following pages require user login to access:
 
-- `/view/question/:id` - 在线做题
-- `/add/question` - 创建题目
-- `/update/question` - 更新题目
-- `/question_submit` - 浏览题目提交
+- `/view/question/:id` - Online problem solving
+- `/add/question` - Create question
+- `/update/question` - Update question
+- `/question_submit` - Browse question submissions
 
-以下页面需要管理员权限：
+The following pages require administrator privileges:
 
-- `/manage/question/` - 管理题目
+- `/manage/question/` - Manage questions
 
-### 鉴权流程
+### Authentication Flow
 
-1. 用户访问需要鉴权的页面时，系统会检查用户登录状态
-2. 如果未登录，自动跳转到登录页面 `/user/login`
-3. 登录成功后，自动跳转回原页面
-4. 如果权限不足，跳转到无权限页面 `/noAuth`
+1. When users access pages requiring authentication, the system checks user login status
+2. If not logged in, automatically redirect to login page `/user/login`
+3. After successful login, automatically redirect back to the original page
+4. If insufficient permissions, redirect to no permission page `/noAuth`
 
-### 使用方法
+### Usage Instructions
 
-1. 启动项目：
+1. Start the project:
 ```bash
 npm install
 npm run serve
 ```
 
-2. 访问需要鉴权的页面时，系统会自动处理登录跳转
+2. When accessing pages requiring authentication, the system will automatically handle login redirection
 
-3. 登录后可以正常访问所有有权限的页面
+3. After login, you can normally access all pages with permissions
 
-## 项目结构
+## Project Structure
 
 ```
 src/
-├── access/           # 权限控制
-│   ├── accessEnum.ts # 权限枚举
-│   ├── checkAccess.ts # 权限检查
-│   └── index.ts      # 路由守卫
-├── components/       # 公共组件
-├── layouts/          # 布局组件
-├── router/           # 路由配置
-├── store/            # 状态管理
-├── views/            # 页面组件
-└── generated/        # 自动生成的API类型
+├── access/           # Permission control
+│   ├── accessEnum.ts # Permission enum
+│   ├── checkAccess.ts # Permission check
+│   └── index.ts      # Route guard
+├── components/       # Public components
+├── layouts/          # Layout components
+├── router/           # Route configuration
+├── store/            # State management
+├── views/            # Page components
+└── generated/        # Auto-generated API types
 ```
 
-## 开发说明
+## Development Notes
 
-- 添加新页面时，在 `router/routes.ts` 中配置路由和权限
-- 权限检查在 `access/index.ts` 中统一处理
-- 用户状态管理在 `store/user.ts` 中
-- 登录页面在 `views/user/UserLoginView.vue`
+- When adding new pages, configure routes and permissions in `router/routes.ts`
+- Permission checks are handled uniformly in `access/index.ts`
+- User state management is in `store/user.ts`
+- Login page is in `views/user/UserLoginView.vue`

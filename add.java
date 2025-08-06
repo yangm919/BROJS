@@ -4,20 +4,20 @@ public class add {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
-        // 读取输入数组
+        // Read input array
         String inputLine = scanner.nextLine();
         
-        // 解析数组格式 [1,2] -> 提取数字
+        // Parse array format [1,2] -> extract numbers
         String numbersStr = inputLine.replace("[", "").replace("]", "");
         String[] numberStrings = numbersStr.split(",");
         
-        // 计算总和
+        // Calculate sum
         int sum = 0;
         for (String numStr : numberStrings) {
             sum += Integer.parseInt(numStr.trim());
         }
         
-        // 输出结果
+        // Output result
         System.out.println(sum);
         
         scanner.close();

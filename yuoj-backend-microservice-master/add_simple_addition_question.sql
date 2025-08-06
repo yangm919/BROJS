@@ -1,4 +1,4 @@
--- 添加简单加法题目
+-- Add simple addition question
 INSERT INTO `question` (
     `title`, 
     `content`, 
@@ -8,19 +8,19 @@ INSERT INTO `question` (
     `judgeConfig`, 
     `userId`
 ) VALUES (
-    '简单加法',
-    '给定一个整数数组，计算数组中所有数字的总和。
+    'Simple Addition',
+    'Given an integer array, calculate the sum of all numbers in the array.
 
-示例：
-输入：[1,2]
-输出：3
+Example:
+Input: [1,2]
+Output: 3
 
-要求：
-1. 输入格式为数组，如 [1,2,3]
-2. 输出格式为整数
-3. 数组长度不超过100
-4. 数组元素为整数，范围在-1000到1000之间',
-    '["数组", "基础算法"]',
+Requirements:
+1. Input format is array, such as [1,2,3]
+2. Output format is integer
+3. Array length does not exceed 100
+4. Array elements are integers, range from -1000 to 1000',
+    '["Array", "Basic Algorithm"]',
     '```java
 import java.util.Scanner;
 
@@ -28,20 +28,20 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
-        // 读取输入数组
+        // Read input array
         String inputLine = scanner.nextLine();
         
-        // 解析数组格式 [1,2] -> 提取数字
+        // Parse array format [1,2] -> extract numbers
         String numbersStr = inputLine.replace("[", "").replace("]", "");
         String[] numberStrings = numbersStr.split(",");
         
-        // 计算总和
+        // Calculate sum
         int sum = 0;
         for (String numStr : numberStrings) {
             sum += Integer.parseInt(numStr.trim());
         }
         
-        // 输出结果
+        // Output result
         System.out.println(sum);
         
         scanner.close();

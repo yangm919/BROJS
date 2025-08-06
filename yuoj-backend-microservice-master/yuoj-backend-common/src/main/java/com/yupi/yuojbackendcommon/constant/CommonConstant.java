@@ -1,15 +1,15 @@
 package com.yupi.yuojbackendcommon.constant;
 /**
- * 通用常量
+ * Common constants
  *
  */
 public interface CommonConstant {
     /**
-     * 升序
+     * Ascending order
      */
     String SORT_ORDER_ASC = "ascend";
     /**
-     * 降序
+     * Descending order
      */
     String SORT_ORDER_DESC = " descend";
 }

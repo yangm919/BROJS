@@ -15,7 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableFeignClients(basePackages = {"com.yupi.yuojbackendserviceclient.service"})
 public class YuojBackendJudgeServiceApplication {
     public static void main(String[] args) {
-        // 初始化消息队列，先注释掉，改用 Bean 的方式初始化消息队列（InitRabbitMqBean.java）
+        // Initialize message queue, commented out for now, using Bean method to initialize message queue (InitRabbitMqBean.java)
 //        InitRabbitMq.doInit();
         SpringApplication.run(YuojBackendJudgeServiceApplication.class, args);
     }

@@ -4,7 +4,7 @@
       <a-layout-header class="header">
         <a-space>
           <img src="../assets/bingrui-logo.svg" class="logo" />
-          <div>鱼 OJ</div>
+          <div>Br OJ</div>
         </a-space>
       </a-layout-header>
       <a-layout-content class="content">

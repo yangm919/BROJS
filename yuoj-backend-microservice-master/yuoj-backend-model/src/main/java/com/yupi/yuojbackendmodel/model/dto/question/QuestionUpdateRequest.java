@@ -3,7 +3,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.List;
 /**
- * 更新请求
+ * Update request
  *
  */
 @Data
@@ -13,27 +13,27 @@ public class QuestionUpdateRequest implements Serializable {
      */
     private Long id;
     /**
-     * 标题
+     * Title
      */
     private String title;
     /**
-     * 内容
+     * Content
      */
     private String content;
     /**
-     * 标签列表
+     * Tag list
      */
     private List<String> tags;
     /**
-     * 题目答案
+     * Question answer
      */
     private String answer;
     /**
-     * 判题用例
+     * Judge cases
      */
     private List<JudgeCase> judgeCase;
     /**
-     * 判题配置
+     * Judge configuration
      */
     private JudgeConfig judgeConfig;
     private static final long serialVersionUID = 1L;

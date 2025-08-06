@@ -1,126 +1,126 @@
-# 数据库初始化脚本说明
+# Database Initialization Script Documentation
 
-本目录包含在线判题系统的数据库初始化脚本。
+This directory contains database initialization scripts for the online judge system.
 
-## 文件说明
+## File Description
 
-### 1. `create_table.sql` (原始版本)
-- 基础的数据库表结构创建脚本
-- 包含所有必要的表和索引
-- 不包含初始数据
+### 1. `create_table.sql` (Original Version)
+- Basic database table structure creation script
+- Contains all necessary tables and indexes
+- Does not include initial data
 
-### 2. `init.sql` (完整版本)
-- 完整的数据库初始化脚本
-- 包含数据库创建、表结构、索引、初始数据
-- 包含统计视图和权限设置
-- 适合生产环境使用
+### 2. `init.sql` (Complete Version)
+- Complete database initialization script
+- Contains database creation, table structure, indexes, initial data
+- Includes statistical views and permission settings
+- Suitable for production environment use
 
-### 3. `init-docker.sql` (Docker版本)
-- 专门为Docker环境优化的初始化脚本
-- 包含基本的表结构和必要的初始数据
-- 适合容器化部署
+### 3. `init-docker.sql` (Docker Version)
+- Initialization script optimized specifically for Docker environment
+- Contains basic table structure and necessary initial data
+- Suitable for containerized deployment
 
-## 数据库结构
+## Database Structure
 
-### 核心表
+### Core Tables
 
-1. **user** - 用户表
-   - 存储用户基本信息
-   - 支持多种登录方式（账号密码、微信等）
-   - 包含用户角色管理
+1. **user** - User table
+   - Stores basic user information
+   - Supports multiple login methods (account password, WeChat, etc.)
+   - Includes user role management
 
-2. **question** - 题目表
-   - 存储编程题目信息
-   - 包含题目内容、答案、判题配置
-   - 支持标签分类
+2. **question** - Question table
+   - Stores programming question information
+   - Contains question content, answers, judge configuration
+   - Supports tag classification
 
-3. **question_submit** - 题目提交表
-   - 记录用户的代码提交
-   - 包含判题状态和结果
-   - 支持多种编程语言
+3. **question_submit** - Question submission table
+   - Records user code submissions
+   - Contains judge status and results
+   - Supports multiple programming languages
 
-4. **post** - 帖子表
-   - 社区交流功能
-   - 支持点赞和收藏
+4. **post** - Post table
+   - Community communication functionality
+   - Supports likes and favorites
 
-5. **post_thumb** - 帖子点赞表
-   - 记录用户对帖子的点赞
+5. **post_thumb** - Post like table
+   - Records user likes for posts
 
-6. **post_favour** - 帖子收藏表
-   - 记录用户对帖子的收藏
+6. **post_favour** - Post favorite table
+   - Records user favorites for posts
 
-### 索引设计
+### Index Design
 
-- 主键索引：所有表的id字段
-- 外键索引：userId、questionId等关联字段
-- 业务索引：userAccount、title、status等常用查询字段
-- 唯一索引：post_thumb和post_favour的(postId, userId)组合
+- Primary key indexes: id fields for all tables
+- Foreign key indexes: userId, questionId and other related fields
+- Business indexes: userAccount, title, status and other commonly queried fields
+- Unique indexes: (postId, userId) combination for post_thumb and post_favour
 
-## 使用方法
+## Usage Methods
 
-### 方法1：使用Docker Compose（推荐）
+### Method 1: Using Docker Compose (Recommended)
 
 ```bash
-# 在项目根目录执行
+# Execute in project root directory
 docker-compose up -d
 
-# 数据库会自动初始化
+# Database will be initialized automatically
 ```
 
-### 方法2：手动执行SQL脚本
+### Method 2: Manual SQL Script Execution
 
 ```bash
-# 连接到MySQL
+# Connect to MySQL
 mysql -u root -p
 
-# 执行初始化脚本
+# Execute initialization script
 source /path/to/init-docker.sql;
 ```
 
-### 方法3：使用MySQL命令行
+### Method 3: Using MySQL Command Line
 
 ```bash
-# 创建数据库
+# Create database
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS yuoj CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 执行初始化脚本
+# Execute initialization script
 mysql -u root -p yuoj < init-docker.sql
 ```
 
-## 初始数据
+## Initial Data
 
-### 默认用户
-- **管理员账号**: admin
-- **管理员密码**: 12345678
-- **测试账号**: test
-- **测试密码**: 12345678
+### Default Users
+- **Administrator account**: admin
+- **Administrator password**: 12345678
+- **Test account**: test
+- **Test password**: 12345678
 
-### 示例题目
-- **两数之和**: 经典的数组哈希表题目
-- 包含完整的题目描述、示例和答案
-- 配置了判题用例和限制
+### Sample Questions
+- **Two Sum**: Classic array hash table question
+- Contains complete question description, examples and answers
+- Configured with judge cases and limits
 
-### 示例帖子
-- 系统介绍和欢迎信息
-- 编程技巧分享
+### Sample Posts
+- System introduction and welcome information
+- Programming tips sharing
 
-## 注意事项
+## Important Notes
 
-1. **字符集**: 使用utf8mb4支持完整的Unicode字符
-2. **排序规则**: utf8mb4_unicode_ci提供良好的排序性能
-3. **逻辑删除**: 所有表都支持软删除（isDelete字段）
-4. **时间戳**: 自动维护createTime和updateTime
-5. **索引优化**: 针对常用查询场景优化了索引
+1. **Character Set**: Uses utf8mb4 to support complete Unicode characters
+2. **Collation**: utf8mb4_unicode_ci provides good sorting performance
+3. **Logical Deletion**: All tables support soft deletion (isDelete field)
+4. **Timestamps**: Automatically maintains createTime and updateTime
+5. **Index Optimization**: Indexes optimized for common query scenarios
 
-## 数据库配置
+## Database Configuration
 
-### 连接信息
-- **数据库名**: yuoj
-- **字符集**: utf8mb4
-- **排序规则**: utf8mb4_unicode_ci
+### Connection Information
+- **Database name**: yuoj
+- **Character set**: utf8mb4
+- **Collation**: utf8mb4_unicode_ci
 
-### 应用配置
-在Spring Boot应用的`application.yml`中配置：
+### Application Configuration
+Configure in Spring Boot application's `application.yml`:
 
 ```yaml
 spring:
@@ -131,22 +131,22 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 ```
 
-## 备份和恢复
+## Backup and Recovery
 
-### 备份数据库
+### Backup Database
 ```bash
 mysqldump -u root -p yuoj > yuoj_backup.sql
 ```
 
-### 恢复数据库
+### Restore Database
 ```bash
 mysql -u root -p yuoj < yuoj_backup.sql
 ```
 
-## 版本历史
+## Version History
 
-- **v1.0**: 基础表结构
-- **v1.1**: 添加索引优化
-- **v1.2**: 添加初始数据
-- **v1.3**: 添加统计视图
-- **v2.0**: Docker环境优化 
+- **v1.0**: Basic table structure
+- **v1.1**: Added index optimization
+- **v1.2**: Added initial data
+- **v1.3**: Added statistical views
+- **v2.0**: Docker environment optimization 

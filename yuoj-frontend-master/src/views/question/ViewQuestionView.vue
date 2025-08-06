@@ -3,19 +3,19 @@
     <a-row :gutter="[24, 24]">
       <a-col :md="12" :xs="24">
         <a-tabs default-active-key="question">
-          <a-tab-pane key="question" title="题目">
+          <a-tab-pane key="question" title="Problem">
             <a-card v-if="question" :title="question.title">
               <a-descriptions
-                title="判题条件"
+                title="Judge Conditions"
                 :column="{ xs: 1, md: 2, lg: 3 }"
               >
-                <a-descriptions-item label="时间限制">
+                <a-descriptions-item label="Time Limit">
                   {{ question.judgeConfig.timeLimit ?? 0 }}
                 </a-descriptions-item>
-                <a-descriptions-item label="内存限制">
+                <a-descriptions-item label="Memory Limit">
                   {{ question.judgeConfig.memoryLimit ?? 0 }}
                 </a-descriptions-item>
-                <a-descriptions-item label="堆栈限制">
+                <a-descriptions-item label="Stack Limit">
                   {{ question.judgeConfig.stackLimit ?? 0 }}
                 </a-descriptions-item>
               </a-descriptions>
@@ -32,26 +32,31 @@
               </template>
             </a-card>
           </a-tab-pane>
-          <a-tab-pane key="comment" title="评论" disabled> 评论区</a-tab-pane>
-          <a-tab-pane key="answer" title="答案"> 暂时无法查看答案</a-tab-pane>
+          <a-tab-pane key="comment" title="Comments" disabled>
+            Comment section</a-tab-pane
+          >
+          <a-tab-pane key="answer" title="Solution">
+            Cannot view solution temporarily</a-tab-pane
+          >
         </a-tabs>
       </a-col>
       <a-col :md="12" :xs="24">
         <a-form :model="form" layout="inline">
           <a-form-item
             field="language"
-            label="编程语言"
+            label="Programming Language"
             style="min-width: 240px"
           >
             <a-select
               v-model="form.language"
               :style="{ width: '320px' }"
-              placeholder="选择编程语言"
+              placeholder="Select programming language"
             >
               <a-option>java</a-option>
               <a-option>cpp</a-option>
               <a-option>go</a-option>
               <a-option>html</a-option>
+              <a-option>python</a-option>
             </a-select>
           </a-form-item>
         </a-form>
@@ -62,7 +67,7 @@
         />
         <a-divider size="0" />
         <a-button type="primary" style="min-width: 200px" @click="doSubmit">
-          提交代码
+          Submit Code
         </a-button>
       </a-col>
     </a-row>
@@ -97,7 +102,7 @@ const loadData = async () => {
   if (res.code === 0) {
     question.value = res.data;
   } else {
-    message.error("加载失败，" + res.message);
+    message.error("Loading failed, " + res.message);
   }
 };
 
@@ -107,7 +112,7 @@ const form = ref<QuestionSubmitAddRequest>({
 });
 
 /**
- * 提交代码
+ * Submit code
  */
 const doSubmit = async () => {
   if (!question.value?.id) {
@@ -119,14 +124,14 @@ const doSubmit = async () => {
     questionId: question.value.id,
   });
   if (res.code === 0) {
-    message.success("提交成功");
+    message.success("Submission successful");
   } else {
-    message.error("提交失败," + res.message);
+    message.error("Submission failed, " + res.message);
   }
 };
 
 /**
- * 页面加载时，请求数据
+ * Request data when page loads
  */
 onMounted(() => {
   loadData();

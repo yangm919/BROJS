@@ -4,22 +4,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * 运行其他程序（比如危险木马）
+ * Run other programs (such as dangerous trojans)
  */
 public class Main {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         String userDir = System.getProperty("user.dir");
-        String filePath = userDir + File.separator + "src/main/resources/木马程序.bat";
+        String filePath = userDir + File.separator + "src/main/resources/trojan.bat";
         Process process = Runtime.getRuntime().exec(filePath);
         process.waitFor();
-        // 分批获取进程的正常输出
+        // Get process normal output in batches
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        // 逐行读取
+        // Read line by line
         String compileOutputLine;
         while ((compileOutputLine = bufferedReader.readLine()) != null) {
             System.out.println(compileOutputLine);
         }
-        System.out.println("执行异常程序成功");
+        System.out.println("Successfully executed malicious program");
     }
 }

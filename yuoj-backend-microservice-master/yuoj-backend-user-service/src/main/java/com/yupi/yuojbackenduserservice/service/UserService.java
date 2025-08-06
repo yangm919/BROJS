@@ -9,92 +9,92 @@ import com.yupi.yuojbackendmodel.model.vo.UserVO;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 /**
- * 用户服务
+ * User service
  *
  */
 public interface UserService extends IService<User> {
     /**
-     * 用户注册
+     * User registration
      *
-     * @param userAccount   用户账户
-     * @param userPassword  用户密码
-     * @param checkPassword 校验密码
-     * @return 新用户 id
+     * @param userAccount   User account
+     * @param userPassword  User password
+     * @param checkPassword Check password
+     * @return New user id
      */
     long userRegister(String userAccount, String userPassword, String checkPassword);
     /**
-     * 用户登录
+     * User login
      *
-     * @param userAccount  用户账户
-     * @param userPassword 用户密码
+     * @param userAccount   User account
+     * @param userPassword  User password
      * @param request
-     * @return 脱敏后的用户信息
+     * @return Desensitized user information
      */
     LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request);
     /**
-     * 获取当前登录用户
+     * Get current logged in user
      *
      * @param request
      * @return
      */
     User getLoginUser(HttpServletRequest request);
     /**
-     * 获取当前登录用户（允许未登录）
+     * Get current logged in user (allow not logged in)
      *
      * @param request
      * @return
      */
     User getLoginUserPermitNull(HttpServletRequest request);
     /**
-     * 是否为管理员
+     * Whether is admin
      *
      * @param request
      * @return
      */
     boolean isAdmin(HttpServletRequest request);
     /**
-     * 是否为管理员
+     * Whether is admin
      *
      * @param user
      * @return
      */
     boolean isAdmin(User user);
     /**
-     * 用户注销
+     * User logout
      *
      * @param request
      * @return
      */
     boolean userLogout(HttpServletRequest request);
     /**
-     * 获取脱敏的已登录用户信息
+     * Get desensitized logged in user information
      *
      * @return
      */
     LoginUserVO getLoginUserVO(User user);
     /**
-     * 获取用户统计信息
+     * Get user statistics
      *
-     * @param userId 用户ID
-     * @return 用户统计信息
+     * @param userId User ID
+     * @return User statistics
      */
     UserStatisticsVO getUserStatistics(Long userId);
     /**
-     * 获取查询条件
+     * Get query wrapper
      *
      * @param userQueryRequest
      * @return
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
     /**
-     * 获取用户封装
+     * Get user wrapper
      *
      * @param user
      * @return
      */
     UserVO getUserVO(User user);
     /**
-     * 获取用户封装
+     * Get user wrapper
      *
      * @param userList
      * @return

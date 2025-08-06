@@ -1,27 +1,27 @@
-# 公共配置文件
+# Common configuration file
 
 spring:
   application:
     name: yuoj-backend-judge-service
-  # 默认 dev 环境
+  # Default dev environment
   profiles:
     active: dev
-  # 支持 swagger3
+  # Support swagger3
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  # session 配置
+  # Session configuration
   session:
     store-type: redis
-    # 30 天过期
+    # 30 days expiration
     timeout: 2592000
-  # 数据库配置
+  # Database configuration
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/yuoj
     username: root
     password: 123456
-  # Redis 配置
+  # Redis configuration
   redis:
     database: 1
     host: localhost
@@ -29,12 +29,12 @@ spring:
     timeout: 5000
   servlet:
     multipart:
-      # 大小限制
+      # Size limit
       max-file-size: 10MB
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848
+        server-addr: nacos:8848
         namespace: public
         register-enabled: true
         watch-delay: 3000
@@ -51,7 +51,7 @@ server:
   port: 8104
   servlet:
     context-path: /api/judge
-    # cookie 30 天过期
+    # Cookie 30 days expiration
     session:
       cookie:
         max-age: 2592000
@@ -62,10 +62,10 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
-      logic-delete-field: isDelete # 全局逻辑删除的实体字段名
-      logic-delete-value: 1 # 逻辑已删除值（默认为 1）
-      logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
-# 代码沙箱配置
+      logic-delete-field: isDelete # Global logical deletion entity field name
+      logic-delete-value: 1 # Logical deleted value (default is 1)
+      logic-not-delete-value: 0 # Logical not deleted value (default is 0)
+# Code sandbox configuration
 codesandbox:
   type: judge0
   judge0:

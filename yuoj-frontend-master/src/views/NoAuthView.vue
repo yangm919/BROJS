@@ -4,16 +4,18 @@
       <div class="icon">
         <icon-exclamation-circle-fill />
       </div>
-      <h2 class="title">访问被拒绝</h2>
-      <p class="description">抱歉，您没有权限访问此页面</p>
+      <h2 class="title">Access Denied</h2>
+      <p class="description">
+        Sorry, you don't have permission to access this page
+      </p>
       <div class="actions">
         <a-button type="primary" @click="goHome">
           <icon-home />
-          返回首页
+          Back to Home
         </a-button>
         <a-button @click="goBack">
           <icon-arrow-left />
-          返回上页
+          Go Back
         </a-button>
       </div>
     </div>

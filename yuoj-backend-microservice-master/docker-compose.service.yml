@@ -50,6 +50,14 @@ services:
       - "8104:8104"
     environment:
       - NACOS_HOST=yuoj-nacos
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+      - NET_ADMIN
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - mynetwork
     depends_on:
@@ -57,7 +65,7 @@ services:
       - yuoj-backend-question-service
       - yuoj-backend-gateway
 
-# 网络，不定义的话就是默认网络
+# Network, if not defined then it's the default network
 networks:
   mynetwork:
 

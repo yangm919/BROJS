@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 /**
- * 读取服务器文件（文件信息泄露）
+ * Read server files (file information leak)
  */
 public class ReadFileError {
 

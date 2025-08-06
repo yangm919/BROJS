@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>欢迎使用鱼 OJ 在线编程评测系统</p>
+    <p>Welcome to Br OJ Online Programming Evaluation System</p>
   </div>
 </template>
 

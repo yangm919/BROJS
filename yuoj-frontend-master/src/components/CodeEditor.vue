@@ -19,7 +19,7 @@ import {
 } from "vue";
 
 /**
- * 定义组件属性类型
+ * Define component property types
  */
 interface Props {
   value: string;
@@ -28,7 +28,7 @@ interface Props {
 }
 
 /**
- * 给组件指定初始值
+ * Specify initial values for component
  */
 const props = withDefaults(defineProps<Props>(), {
   value: () => "",
@@ -61,7 +61,7 @@ onMounted(() => {
     return;
   }
 
-  // 添加 ResizeObserver 错误处理
+  // Add ResizeObserver error handling
   originalError = console.error;
   console.error = (...args) => {
     if (
@@ -69,7 +69,7 @@ onMounted(() => {
       typeof args[0] === "string" &&
       args[0].includes("ResizeObserver")
     ) {
-      return; // 忽略 ResizeObserver 警告
+      return; // Ignore ResizeObserver warnings
     }
     originalError.apply(console, args);
   };
@@ -78,7 +78,7 @@ onMounted(() => {
   codeEditor.value = monaco.editor.create(codeEditorRef.value, {
     value: props.value,
     language: props.language,
-    automaticLayout: false, // 改为 false 减少 resize 事件
+    automaticLayout: false, // Set to false to reduce resize events
     colorDecorators: true,
     minimap: {
       enabled: true,
@@ -90,9 +90,9 @@ onMounted(() => {
     // scrollBeyondLastLine: false,
   });
 
-  // 手动处理布局调整，使用防抖
+  // Manually handle layout adjustments with debouncing
   resizeObserver = new ResizeObserver((entries) => {
-    // 忽略 ResizeObserver 循环错误
+    // Ignore ResizeObserver loop errors
     if (entries.length === 0) return;
 
     clearTimeout(resizeTimeout);
@@ -101,40 +101,40 @@ onMounted(() => {
         try {
           toRaw(codeEditor.value).layout();
         } catch (error) {
-          // 忽略布局错误
+          // Ignore layout errors
         }
       }
-    }, 200); // 增加防抖时间到 200ms
+    }, 200); // Increase debounce time to 200ms
   });
 
   if (codeEditorRef.value) {
     try {
       resizeObserver.observe(codeEditorRef.value);
     } catch (error) {
-      // 忽略观察器错误
+      // Ignore observer errors
     }
   }
 
-  // 编辑 监听内容变化
+  // Edit - listen for content changes
   codeEditor.value.onDidChangeModelContent(() => {
     props.handleChange(toRaw(codeEditor.value).getValue());
   });
 });
 
-// 组件卸载时清理资源
+// Clean up resources when component unmounts
 onUnmounted(() => {
   if (codeEditor.value) {
     toRaw(codeEditor.value).dispose();
   }
-  // 清理 ResizeObserver
+  // Clean up ResizeObserver
   if (resizeObserver) {
     resizeObserver.disconnect();
   }
-  // 清理定时器
+  // Clean up timer
   if (resizeTimeout) {
     clearTimeout(resizeTimeout);
   }
-  // 恢复原始 console.error
+  // Restore original console.error
   if (originalError) {
     console.error = originalError;
   }

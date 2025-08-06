@@ -2,12 +2,12 @@ package com.yupi.yuojbackendcommon.utils;
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 /**
- * 网络工具类
+ * Network utility class
  *
  */
 public class NetUtils {
     /**
-     * 获取客户端 IP 地址
+     * Get client IP address
      *
      * @param request
      * @return
@@ -23,7 +23,7 @@ public class NetUtils {
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
             if (ip.equals("127.0.0.1")) {
-                // 根据网卡取本机配置的 IP
+                // Get local IP based on network card configuration
                 InetAddress inet = null;
                 try {
                     inet = InetAddress.getLocalHost();
@@ -35,7 +35,7 @@ public class NetUtils {
                 }
             }
         }
-        // 多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
+        // Multiple proxy case, first IP is client real IP, multiple IPs separated by ','
         if (ip != null && ip.length() > 15) {
             if (ip.indexOf(",") > 0) {
                 ip = ip.substring(0, ip.indexOf(","));

@@ -4,13 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 /**
- * 题目提交编程语言枚举
+ * Question submission programming language enumeration
  *
  */
 public enum QuestionSubmitLanguageEnum {
     JAVA("java", "java"),
     CPLUSPLUS("cpp", "cpp"),
-    GOLANG("go", "go");
+    GOLANG("go", "go"),
+    PYTHON("python", "python");
     private final String text;
     private final String value;
     QuestionSubmitLanguageEnum(String text, String value) {
@@ -18,7 +19,7 @@ public enum QuestionSubmitLanguageEnum {
         this.value = value;
     }
     /**
-     * 获取值列表
+     * Get value list
      *
      * @return
      */
@@ -26,7 +27,7 @@ public enum QuestionSubmitLanguageEnum {
         return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
     }
     /**
-     * 根据 value 获取枚举
+     * Get enum by value
      *
      * @param value
      * @return

@@ -1,23 +1,32 @@
 <template>
   <div id="questionSubmitView">
     <a-form :model="searchParams" layout="inline">
-      <a-form-item field="questionId" label="题号" style="min-width: 240px">
-        <a-input v-model="searchParams.questionId" placeholder="请输入" />
+      <a-form-item
+        field="questionId"
+        label="Question ID"
+        style="min-width: 240px"
+      >
+        <a-input v-model="searchParams.questionId" placeholder="Please enter" />
       </a-form-item>
-      <a-form-item field="language" label="编程语言" style="min-width: 240px">
+      <a-form-item
+        field="language"
+        label="Programming Language"
+        style="min-width: 240px"
+      >
         <a-select
           v-model="searchParams.language"
           :style="{ width: '320px' }"
-          placeholder="选择编程语言"
+          placeholder="Select programming language"
         >
           <a-option>java</a-option>
           <a-option>cpp</a-option>
           <a-option>go</a-option>
           <a-option>html</a-option>
+          <a-option>python</a-option>
         </a-select>
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" @click="doSubmit">搜索</a-button>
+        <a-button type="primary" @click="doSubmit">Search</a-button>
       </a-form-item>
     </a-form>
     <a-divider :size="0" />
@@ -34,7 +43,31 @@
       @page-change="onPageChange"
     >
       <template #judgeInfo="{ record }">
-        {{ JSON.stringify(record.judgeInfo) }}
+        <div v-if="record.judgeInfo">
+          <div v-if="typeof record.judgeInfo === 'string'">
+            {{ record.judgeInfo }}
+          </div>
+          <div v-else>
+            <div class="judge-info">
+              <div class="judge-message">
+                <a-tag :color="getJudgeStatusColor(record.judgeInfo.message)">
+                  {{ record.judgeInfo.message }}
+                </a-tag>
+              </div>
+              <div
+                class="judge-stats"
+                v-if="record.judgeInfo.memory || record.judgeInfo.time"
+              >
+                <span class="stat-item" v-if="record.judgeInfo.memory">
+                  <icon-memory /> {{ formatMemory(record.judgeInfo.memory) }}
+                </span>
+                <span class="stat-item" v-if="record.judgeInfo.time">
+                  <icon-clock-circle /> {{ formatTime(record.judgeInfo.time) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </template>
       <template #createTime="{ record }">
         {{ moment(record.createTime).format("YYYY-MM-DD") }}
@@ -77,19 +110,19 @@ const loadData = async () => {
     dataList.value = res.data.records;
     total.value = Number(res.data.total);
   } else {
-    message.error("加载失败，" + res.message);
+    message.error("Loading failed, " + res.message);
   }
 };
 
 /**
- * 监听 searchParams 变量，改变时触发页面的重新加载
+ * Watch searchParams variable, trigger page reload when changed
  */
 watchEffect(() => {
   loadData();
 });
 
 /**
- * 页面加载时，请求数据
+ * Request data when page loads
  */
 onMounted(() => {
   loadData();
@@ -97,31 +130,31 @@ onMounted(() => {
 
 const columns = [
   {
-    title: "提交号",
+    title: "Submission ID",
     dataIndex: "id",
   },
   {
-    title: "编程语言",
+    title: "Programming Language",
     dataIndex: "language",
   },
   {
-    title: "判题信息",
+    title: "Judge Info",
     slotName: "judgeInfo",
   },
   {
-    title: "判题状态",
+    title: "Judge Status",
     dataIndex: "status",
   },
   {
-    title: "题目 id",
+    title: "Question ID",
     dataIndex: "questionId",
   },
   {
-    title: "提交者 id",
+    title: "Submitter ID",
     dataIndex: "userId",
   },
   {
-    title: "创建时间",
+    title: "Create Time",
     slotName: "createTime",
   },
 ];
@@ -136,24 +169,62 @@ const onPageChange = (page: number) => {
 const router = useRouter();
 
 /**
- * 跳转到做题页面
+ * Navigate to problem solving page
  * @param question
  */
 const toQuestionPage = (question: Question) => {
   router.push({
-    path: `/view/question/${question.id}`,
+    path: `/question/view/${question.id}`,
   });
 };
 
 /**
- * 确认搜索，重新加载数据
+ * Confirm search, reload data
  */
 const doSubmit = () => {
-  // 这里需要重置搜索页号
+  // Need to reset search page number here
   searchParams.value = {
     ...searchParams.value,
     current: 1,
   };
+};
+
+/**
+ * Get judge status color
+ */
+const getJudgeStatusColor = (message: string) => {
+  switch (message) {
+    case "Accepted":
+      return "green";
+    case "Wrong Answer":
+      return "red";
+    case "Time Limit Exceeded":
+      return "orange";
+    case "Memory Limit Exceeded":
+      return "orange";
+    case "Runtime Error":
+      return "red";
+    default:
+      return "blue";
+  }
+};
+
+/**
+ * Format memory usage
+ */
+const formatMemory = (memory: number) => {
+  if (memory < 1024) {
+    return `${memory} KB`;
+  } else {
+    return `${(memory / 1024).toFixed(1)} MB`;
+  }
+};
+
+/**
+ * Format time usage
+ */
+const formatTime = (time: number) => {
+  return `${time} ms`;
 };
 </script>
 
@@ -161,5 +232,33 @@ const doSubmit = () => {
 #questionSubmitView {
   max-width: 1280px;
   margin: 0 auto;
+}
+
+.judge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.judge-message {
+  display: flex;
+  align-items: center;
+}
+
+.judge-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-item .arco-icon {
+  font-size: 14px;
 }
 </style>

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Java 代码沙箱模板方法的实现
+ * Java code sandbox template method implementation
  */
 @Slf4j
 public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
@@ -33,20 +33,20 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         String code = executeCodeRequest.getCode();
         String language = executeCodeRequest.getLanguage();
 
-//        1. 把用户的代码保存为文件
+//        1. Save user code to file
         File userCodeFile = saveCodeToFile(code);
 
-//        2. 编译代码，得到 class 文件
+//        2. Compile code, get class file
         ExecuteMessage compileFileExecuteMessage = compileFile(userCodeFile);
         System.out.println(compileFileExecuteMessage);
 
-        // 3. 执行代码，得到输出结果
+        // 3. Execute code, get output results
         List<ExecuteMessage> executeMessageList = runFile(userCodeFile, inputList);
 
-//        4. 收集整理输出结果
+//        4. Collect and organize output results
         ExecuteCodeResponse outputResponse = getOutputResponse(executeMessageList);
 
-//        5. 文件清理
+//        5. File cleanup
         boolean b = deleteFile(userCodeFile);
         if (!b) {
             log.error("deleteFile error, userCodeFilePath = {}", userCodeFile.getAbsolutePath());
@@ -56,19 +56,19 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
 
 
     /**
-     * 1. 把用户的代码保存为文件
-     * @param code 用户代码
+     * 1. Save user code to file
+     * @param code User code
      * @return
      */
     public File saveCodeToFile(String code) {
         String userDir = System.getProperty("user.dir");
         String globalCodePathName = userDir + File.separator + GLOBAL_CODE_DIR_NAME;
-        // 判断全局代码目录是否存在，没有则新建
+        // Check if global code directory exists, create if not
         if (!FileUtil.exist(globalCodePathName)) {
             FileUtil.mkdir(globalCodePathName);
         }
 
-        // 把用户的代码隔离存放
+        // Isolate user code storage
         String userCodeParentPath = globalCodePathName + File.separator + UUID.randomUUID();
         String userCodePath = userCodeParentPath + File.separator + GLOBAL_JAVA_CLASS_NAME;
         File userCodeFile = FileUtil.writeString(code, userCodePath, StandardCharsets.UTF_8);
@@ -76,7 +76,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
     }
 
     /**
-     * 2、编译代码
+     * 2. Compile code
      * @param userCodeFile
      * @return
      */
@@ -84,9 +84,9 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         String compileCmd = String.format("javac -encoding utf-8 %s", userCodeFile.getAbsolutePath());
         try {
             Process compileProcess = Runtime.getRuntime().exec(compileCmd);
-            ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(compileProcess, "编译");
+            ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(compileProcess, "compile");
             if (executeMessage.getExitValue() != 0) {
-                throw new RuntimeException("编译错误");
+                throw new RuntimeException("Compile error");
             }
             return executeMessage;
         } catch (Exception e) {
@@ -96,7 +96,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
     }
 
     /**
-     * 3、执行文件，获得执行结果列表
+     * 3. Execute file and get result list
      * @param userCodeFile
      * @param inputList
      * @return
@@ -110,41 +110,41 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
             String runCmd = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCmd);
-                // 超时控制
+                // Timeout control
                 new Thread(() -> {
                     try {
                         Thread.sleep(TIME_OUT);
-                        System.out.println("超时了，中断");
+                        System.out.println("Timeout, interrupting");
                         runProcess.destroy();
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }).start();
-                ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行");
+                ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "run");
                 System.out.println(executeMessage);
                 executeMessageList.add(executeMessage);
             } catch (Exception e) {
-                throw new RuntimeException("执行错误", e);
+                throw new RuntimeException("Execution error", e);
             }
         }
         return executeMessageList;
     }
 
     /**
-     * 4、获取输出结果
+     * 4. Get output result
      * @param executeMessageList
      * @return
      */
     public ExecuteCodeResponse getOutputResponse(List<ExecuteMessage> executeMessageList) {
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
         List<String> outputList = new ArrayList<>();
-        // 取用时最大值，便于判断是否超时
+        // Use the maximum time to determine if timeout occurred
         long maxTime = 0;
         for (ExecuteMessage executeMessage : executeMessageList) {
             String errorMessage = executeMessage.getErrorMessage();
             if (StrUtil.isNotBlank(errorMessage)) {
                 executeCodeResponse.setMessage(errorMessage);
-                // 用户提交的代码执行中存在错误
+                // There was an error during user code execution
                 executeCodeResponse.setStatus(3);
                 break;
             }
@@ -154,21 +154,13 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
                 maxTime = Math.max(maxTime, time);
             }
         }
-        // 正常运行完成
-        if (outputList.size() == executeMessageList.size()) {
-            executeCodeResponse.setStatus(1);
-        }
         executeCodeResponse.setOutputList(outputList);
-        JudgeInfo judgeInfo = new JudgeInfo();
-        judgeInfo.setTime(maxTime);
-        // 要借助第三方库来获取内存占用，非常麻烦，此处不做实现
-//        judgeInfo.setMemory();
-        executeCodeResponse.setJudgeInfo(judgeInfo);
+        // executeCodeResponse.setTime(maxTime);
         return executeCodeResponse;
     }
 
     /**
-     * 5、删除文件
+     * 5. Delete file
      * @param userCodeFile
      * @return
      */
@@ -176,14 +168,14 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         if (userCodeFile.getParentFile() != null) {
             String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
             boolean del = FileUtil.del(userCodeParentPath);
-            System.out.println("删除" + (del ? "成功" : "失败"));
+            System.out.println("Deleted" + (del ? "successfully" : "failed"));
             return del;
         }
         return true;
     }
 
     /**
-     * 6、获取错误响应
+     * 6. Get error response
      *
      * @param e
      * @return
@@ -192,7 +184,7 @@ public abstract class JavaCodeSandboxTemplate implements CodeSandbox {
         ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
         executeCodeResponse.setOutputList(new ArrayList<>());
         executeCodeResponse.setMessage(e.getMessage());
-        // 表示代码沙箱错误
+        // Indicates code sandbox error
         executeCodeResponse.setStatus(2);
         executeCodeResponse.setJudgeInfo(new JudgeInfo());
         return executeCodeResponse;

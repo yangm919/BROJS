@@ -8,8 +8,8 @@
             src="../../assets/bingrui-logo.svg"
             alt="Bingrui Logo"
           />
-          <h2 class="title">用户注册</h2>
-          <p class="subtitle">创建您的鱼 OJ 账号</p>
+          <h2 class="title">User Registration</h2>
+          <p class="subtitle">Create your Br OJ account</p>
         </div>
 
         <a-form
@@ -19,35 +19,38 @@
           :model="form"
           @submit="handleSubmit"
         >
-          <a-form-item field="userAccount" label="账号">
-            <a-input v-model="form.userAccount" placeholder="请输入账号" />
+          <a-form-item field="userAccount" label="Account">
+            <a-input
+              v-model="form.userAccount"
+              placeholder="Please enter your account"
+            />
           </a-form-item>
           <a-form-item
             field="userPassword"
-            tooltip="密码不少于 8 位"
-            label="密码"
+            tooltip="Password must be at least 8 characters"
+            label="Password"
           >
             <a-input-password
               v-model="form.userPassword"
-              placeholder="请输入密码"
+              placeholder="Please enter your password"
             />
           </a-form-item>
-          <a-form-item field="checkPassword" label="确认密码">
+          <a-form-item field="checkPassword" label="Confirm Password">
             <a-input-password
               v-model="form.checkPassword"
-              placeholder="请再次输入密码"
+              placeholder="Please enter your password again"
             />
           </a-form-item>
           <a-form-item>
             <a-button type="primary" html-type="submit" style="width: 120px">
-              注册
+              Register
             </a-button>
           </a-form-item>
         </a-form>
 
         <div class="register-footer">
-          <span>已有账号？</span>
-          <a-link @click="goToLogin">立即登录</a-link>
+          <span>Already have an account?</span>
+          <a-link @click="goToLogin">Login Now</a-link>
         </div>
       </div>
     </div>
@@ -61,7 +64,7 @@ import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
 
 /**
- * 表单信息
+ * Form information
  */
 const form = reactive({
   userAccount: "",
@@ -72,18 +75,18 @@ const form = reactive({
 const router = useRouter();
 
 /**
- * 提交表单
+ * Submit form
  */
 const handleSubmit = async () => {
-  // 验证密码
+  // Validate password
   if (form.userPassword !== form.checkPassword) {
-    message.error("两次输入的密码不一致");
+    message.error("The two passwords entered are inconsistent");
     return;
   }
 
-  // 验证密码长度
+  // Validate password length
   if (form.userPassword && form.userPassword.length < 8) {
-    message.error("密码长度不能少于8位");
+    message.error("Password length cannot be less than 8 characters");
     return;
   }
 
@@ -95,19 +98,19 @@ const handleSubmit = async () => {
     });
 
     if (res.code === 0) {
-      message.success("注册成功，请登录");
+      message.success("Registration successful, please login");
       router.push("/user/login");
     } else {
-      message.error("注册失败：" + res.message);
+      message.error("Registration failed: " + res.message);
     }
   } catch (error: any) {
-    console.error("注册错误:", error);
-    message.error("注册失败，请检查网络连接");
+    console.error("Registration error:", error);
+    message.error("Registration failed, please check network connection");
   }
 };
 
 /**
- * 跳转到登录页面
+ * Navigate to login page
  */
 const goToLogin = () => {
   router.push("/user/login");

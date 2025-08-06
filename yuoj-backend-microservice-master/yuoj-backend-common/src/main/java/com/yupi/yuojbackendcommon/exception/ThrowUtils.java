@@ -1,11 +1,11 @@
 package com.yupi.yuojbackendcommon.exception;
 import com.yupi.yuojbackendcommon.common.ErrorCode;
 /**
- * 抛异常工具类
+ * Exception throwing utility class
  */
 public class ThrowUtils {
     /**
-     * 条件成立则抛异常
+     * Throw exception if condition is true
      *
      * @param condition
      * @param runtimeException
@@ -16,7 +16,7 @@ public class ThrowUtils {
         }
     }
     /**
-     * 条件成立则抛异常
+     * Throw exception if condition is true
      *
      * @param condition
      * @param errorCode
@@ -25,7 +25,7 @@ public class ThrowUtils {
         throwIf(condition, new BusinessException(errorCode));
     }
     /**
-     * 条件成立则抛异常
+     * Throw exception if condition is true
      *
      * @param condition
      * @param errorCode

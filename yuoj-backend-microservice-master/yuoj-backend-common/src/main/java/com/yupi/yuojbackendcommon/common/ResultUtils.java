@@ -1,11 +1,11 @@
 package com.yupi.yuojbackendcommon.common;
 /**
- * 返回工具类
+ * Response utility class
  *
  */
 public class ResultUtils {
     /**
-     * 成功
+     * Success
      *
      * @param data
      * @param <T>
@@ -15,7 +15,7 @@ public class ResultUtils {
         return new BaseResponse<>(0, data, "ok");
     }
     /**
-     * 失败
+     * Error
      *
      * @param errorCode
      * @return
@@ -24,7 +24,7 @@ public class ResultUtils {
         return new BaseResponse<>(errorCode);
     }
     /**
-     * 失败
+     * Error
      *
      * @param code
      * @param message
@@ -34,7 +34,7 @@ public class ResultUtils {
         return new BaseResponse(code, null, message);
     }
     /**
-     * 失败
+     * Error
      *
      * @param errorCode
      * @return

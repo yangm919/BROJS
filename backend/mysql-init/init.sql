@@ -1,143 +1,142 @@
- 数据库初始化脚本
 CREATE DATABASE IF NOT EXISTS `yuoj` 
 CHARACTER SET utf8mb4 
 COLLATE utf8mb4_unicode_ci;
 
 USE `yuoj`;
 
--- 用户表
+-- User table
 CREATE TABLE IF NOT EXISTS `user` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '用户ID' PRIMARY KEY,
-    `userAccount` VARCHAR(256) NOT NULL COMMENT '用户账号',
-    `userPassword` VARCHAR(512) NOT NULL COMMENT '用户密码',
-    `unionId` VARCHAR(256) NULL COMMENT '微信开放平台ID',
-    `mpOpenId` VARCHAR(256) NULL COMMENT '公众号openId',
-    `userName` VARCHAR(256) NULL COMMENT '用户昵称',
-    `userAvatar` VARCHAR(1024) NULL COMMENT '用户头像',
-    `userProfile` VARCHAR(512) NULL COMMENT '用户简介',
-    `userRole` VARCHAR(256) DEFAULT 'user' NOT NULL COMMENT '用户角色：user/admin/ban',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT '是否删除',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'User ID' PRIMARY KEY,
+    `userAccount` VARCHAR(256) NOT NULL COMMENT 'User account',
+    `userPassword` VARCHAR(512) NOT NULL COMMENT 'User password',
+    `unionId` VARCHAR(256) NULL COMMENT 'WeChat Open Platform ID',
+    `mpOpenId` VARCHAR(256) NULL COMMENT 'WeChat Official Account openId',
+    `userName` VARCHAR(256) NULL COMMENT 'User nickname',
+    `userAvatar` VARCHAR(1024) NULL COMMENT 'User avatar',
+    `userProfile` VARCHAR(512) NULL COMMENT 'User profile',
+    `userRole` VARCHAR(256) DEFAULT 'user' NOT NULL COMMENT 'User role: user/admin/ban',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT 'Is deleted',
     INDEX `idx_unionId` (`unionId`),
     INDEX `idx_userAccount` (`userAccount`),
     INDEX `idx_userRole` (`userRole`)
-) COMMENT '用户表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'User table' COLLATE = utf8mb4_unicode_ci;
 
--- 题目表
+-- Question table
 CREATE TABLE IF NOT EXISTS `question` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '题目ID' PRIMARY KEY,
-    `title` VARCHAR(512) NULL COMMENT '题目标题',
-    `content` TEXT NULL COMMENT '题目内容',
-    `tags` VARCHAR(1024) NULL COMMENT '标签列表（json 数组）',
-    `answer` TEXT NULL COMMENT '题目答案',
-    `submitNum` INT DEFAULT 0 NOT NULL COMMENT '题目提交数',
-    `acceptedNum` INT DEFAULT 0 NOT NULL COMMENT '题目通过数',
-    `judgeCase` TEXT NULL COMMENT '判题用例（json 数组）',
-    `judgeConfig` TEXT NULL COMMENT '判题配置（json 对象）',
-    `thumbNum` INT DEFAULT 0 NOT NULL COMMENT '点赞数',
-    `favourNum` INT DEFAULT 0 NOT NULL COMMENT '收藏数',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT '是否删除',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Question ID' PRIMARY KEY,
+    `title` VARCHAR(512) NULL COMMENT 'Question title',
+    `content` TEXT NULL COMMENT 'Question content',
+    `tags` VARCHAR(1024) NULL COMMENT 'Tags list (json array)',
+    `answer` TEXT NULL COMMENT 'Question answer',
+    `submitNum` INT DEFAULT 0 NOT NULL COMMENT 'Submit count',
+    `acceptedNum` INT DEFAULT 0 NOT NULL COMMENT 'Accepted count',
+    `judgeCase` TEXT NULL COMMENT 'Judge cases (json array)',
+    `judgeConfig` TEXT NULL COMMENT 'Judge configuration (json object)',
+    `thumbNum` INT DEFAULT 0 NOT NULL COMMENT 'Thumb count',
+    `favourNum` INT DEFAULT 0 NOT NULL COMMENT 'Favour count',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT 'Is deleted',
     INDEX `idx_userId` (`userId`),
     INDEX `idx_title` (`title`),
     INDEX `idx_createTime` (`createTime`)
-) COMMENT '题目表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Question table' COLLATE = utf8mb4_unicode_ci;
 
--- 题目提交表
+-- Question submit table
 CREATE TABLE IF NOT EXISTS `question_submit` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '提交ID' PRIMARY KEY,
-    `language` VARCHAR(128) NOT NULL COMMENT '编程语言',
-    `code` TEXT NOT NULL COMMENT '用户代码',
-    `judgeInfo` TEXT NULL COMMENT '判题信息（json 对象）',
-    `status` INT DEFAULT 0 NOT NULL COMMENT '判题状态（0 - 待判题、1 - 判题中、2 - 成功、3 - 失败）',
-    `questionId` BIGINT NOT NULL COMMENT '题目ID',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT '是否删除',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Submit ID' PRIMARY KEY,
+    `language` VARCHAR(128) NOT NULL COMMENT 'Programming language',
+    `code` TEXT NOT NULL COMMENT 'User code',
+    `judgeInfo` TEXT NULL COMMENT 'Judge information (json object)',
+    `status` INT DEFAULT 0 NOT NULL COMMENT 'Judge status (0 - pending, 1 - judging, 2 - success, 3 - failed)',
+    `questionId` BIGINT NOT NULL COMMENT 'Question ID',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT 'Is deleted',
     INDEX `idx_questionId` (`questionId`),
     INDEX `idx_userId` (`userId`),
     INDEX `idx_status` (`status`),
     INDEX `idx_createTime` (`createTime`)
-) COMMENT '题目提交表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Question submit table' COLLATE = utf8mb4_unicode_ci;
 
--- 帖子表
+-- Post table
 CREATE TABLE IF NOT EXISTS `post` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '帖子ID' PRIMARY KEY,
-    `title` VARCHAR(512) NULL COMMENT '帖子标题',
-    `content` TEXT NULL COMMENT '帖子内容',
-    `tags` VARCHAR(1024) NULL COMMENT '标签列表（json 数组）',
-    `thumbNum` INT DEFAULT 0 NOT NULL COMMENT '点赞数',
-    `favourNum` INT DEFAULT 0 NOT NULL COMMENT '收藏数',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT '是否删除',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Post ID' PRIMARY KEY,
+    `title` VARCHAR(512) NULL COMMENT 'Post title',
+    `content` TEXT NULL COMMENT 'Post content',
+    `tags` VARCHAR(1024) NULL COMMENT 'Tags list (json array)',
+    `thumbNum` INT DEFAULT 0 NOT NULL COMMENT 'Thumb count',
+    `favourNum` INT DEFAULT 0 NOT NULL COMMENT 'Favour count',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
+    `isDelete` TINYINT DEFAULT 0 NOT NULL COMMENT 'Is deleted',
     INDEX `idx_userId` (`userId`),
     INDEX `idx_title` (`title`),
     INDEX `idx_createTime` (`createTime`)
-) COMMENT '帖子表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Post table' COLLATE = utf8mb4_unicode_ci;
 
--- 帖子点赞表
+-- Post thumb table
 CREATE TABLE IF NOT EXISTS `post_thumb` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '点赞ID' PRIMARY KEY,
-    `postId` BIGINT NOT NULL COMMENT '帖子ID',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Thumb ID' PRIMARY KEY,
+    `postId` BIGINT NOT NULL COMMENT 'Post ID',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     INDEX `idx_postId` (`postId`),
     INDEX `idx_userId` (`userId`),
     UNIQUE KEY `uk_post_user` (`postId`, `userId`)
-) COMMENT '帖子点赞表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Post thumb table' COLLATE = utf8mb4_unicode_ci;
 
--- 帖子收藏表
+-- Post favour table
 CREATE TABLE IF NOT EXISTS `post_favour` (
-    `id` BIGINT AUTO_INCREMENT COMMENT '收藏ID' PRIMARY KEY,
-    `postId` BIGINT NOT NULL COMMENT '帖子ID',
-    `userId` BIGINT NOT NULL COMMENT '创建用户ID',
-    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
-    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `id` BIGINT AUTO_INCREMENT COMMENT 'Favour ID' PRIMARY KEY,
+    `postId` BIGINT NOT NULL COMMENT 'Post ID',
+    `userId` BIGINT NOT NULL COMMENT 'Creator user ID',
+    `createTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'Create time',
+    `updateTime` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Update time',
     INDEX `idx_postId` (`postId`),
     INDEX `idx_userId` (`userId`),
     UNIQUE KEY `uk_post_user` (`postId`, `userId`)
-) COMMENT '帖子收藏表' COLLATE = utf8mb4_unicode_ci;
+) COMMENT 'Post favour table' COLLATE = utf8mb4_unicode_ci;
 
--- 插入初始数据
+-- Insert initial data
 INSERT INTO `user` (`userAccount`, `userPassword`, `userName`, `userRole`, `userProfile`) VALUES
-('admin', '03caebb36670995fc5e097d0d8a6f908', '管理员', 'admin', '系统管理员'),
-('test', '03caebb36670995fc5e097d0d8a6f908', '测试用户', 'user', '测试用户账号');
+('admin', '03caebb36670995fc5e097d0d8a6f908', 'Administrator', 'admin', 'System Administrator'),
+('test', '03caebb36670995fc5e097d0d8a6f908', 'Test User', 'user', 'Test user account');
 
--- 插入示例题目
+-- Insert sample question
 INSERT INTO `question` (`title`, `content`, `tags`, `answer`, `judgeCase`, `judgeConfig`, `userId`) VALUES
-('两数之和', 
-'给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出和为目标值 target 的那两个整数，并返回它们的数组下标。
+('Two Sum', 
+'Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
 
-你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
 
-你可以按任意顺序返回答案。
+You can return the answer in any order.
 
-示例 1：
-输入：nums = [2,7,11,15], target = 9
-输出：[0,1]
-解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。
+Example 1:
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
 
-示例 2：
-输入：nums = [3,2,4], target = 6
-输出：[1,2]
+Example 2:
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
 
-示例 3：
-输入：nums = [3,3], target = 6
-输出：[0,1]
+Example 3:
+Input: nums = [3,3], target = 6
+Output: [0,1]
 
-提示：--
+Constraints:
 2 <= nums.length <= 104
 -109 <= nums[i] <= 109
 -109 <= target <= 109
-只会存在一个有效答案', 
-'["数组", "哈希表"]', 
+Only one valid answer exists', 
+'["Array", "Hash Table"]', 
 '```java
 class Solution {
     public int[] twoSum(int[] nums, int target) {
@@ -157,18 +156,17 @@ class Solution {
 '{"timeLimit": 1000, "memoryLimit": 256000}', 
 1);
 
--- 插入示例帖子
+-- Insert sample post
 INSERT INTO `post` (`title`, `content`, `tags`, `userId`) VALUES
-('欢迎来到在线判题系统', 
-'欢迎使用我们的在线判题系统！这是一个功能强大的编程练习平台，支持多种编程语言。
+('Welcome to Online Judge System', 
+'Welcome to our Online Judge System! This is a powerful programming practice platform that supports multiple programming languages.
 
-主要功能：
-- 题目练习：提供各种难度的编程题目
-- 在线判题：实时编译和运行代码
-- 社区交流：分享解题思路和经验
-- 个人中心：查看做题记录和统计
+Main features:
+- Question practice: Provides programming questions of various difficulties
+- Online judging: Real-time code compilation and execution
+- Community communication: Share problem-solving ideas and experiences
+- Personal center: View problem-solving records and statistics
 
-开始你的编程之旅吧！', 
-'["欢迎", "介绍"]', 
+Start your programming journey now!', 
+'["Welcome", "Introduction"]', 
 1);
-

@@ -14,8 +14,8 @@
     >
       <template #optional="{ record }">
         <a-space>
-          <a-button type="primary" @click="doUpdate(record)"> 修改</a-button>
-          <a-button status="danger" @click="doDelete(record)">删除</a-button>
+          <a-button type="primary" @click="doUpdate(record)"> Edit</a-button>
+          <a-button status="danger" @click="doDelete(record)">Delete</a-button>
         </a-space>
       </template>
     </a-table>
@@ -50,25 +50,25 @@ const loadData = async () => {
     dataList.value = res.data.records;
     total.value = res.data.total;
   } else {
-    message.error("加载失败，" + res.message);
+    message.error("Loading failed, " + res.message);
   }
 };
 
 /**
- * 监听 searchParams 变量，改变时触发页面的重新加载
+ * Watch searchParams variable, trigger page reload when changed
  */
 watchEffect(() => {
   loadData();
 });
 
 /**
- * 页面加载时，请求数据
+ * Request data when page loads
  */
 onMounted(() => {
   loadData();
 });
 
-// {id: "1", title: "A+ D", content: "新的题目内容", tags: "["二叉树"]", answer: "新的答案", submitNum: 0,…}
+// Example data structure: {id: "1", title: "A+ D", content: "New question content", tags: "["binary tree"]", answer: "New answer", submitNum: 0,…}
 
 const columns = [
   {
@@ -76,47 +76,47 @@ const columns = [
     dataIndex: "id",
   },
   {
-    title: "标题",
+    title: "Title",
     dataIndex: "title",
   },
   {
-    title: "内容",
+    title: "Content",
     dataIndex: "content",
   },
   {
-    title: "标签",
+    title: "Tags",
     dataIndex: "tags",
   },
   {
-    title: "答案",
+    title: "Answer",
     dataIndex: "answer",
   },
   {
-    title: "提交数",
+    title: "Submission Count",
     dataIndex: "submitNum",
   },
   {
-    title: "成功提交数",
+    title: "Accepted Count",
     dataIndex: "acceptedNum",
   },
   {
-    title: "判题配置",
+    title: "Judge Config",
     dataIndex: "judgeConfig",
   },
   {
-    title: "判题用例",
+    title: "Judge Cases",
     dataIndex: "judgeCase",
   },
   {
-    title: "用户id",
+    title: "User ID",
     dataIndex: "userId",
   },
   {
-    title: "创建时间",
+    title: "Create Time",
     dataIndex: "createTime",
   },
   {
-    title: "操作",
+    title: "Actions",
     slotName: "optional",
   },
 ];
@@ -133,10 +133,10 @@ const doDelete = async (question: Question) => {
     id: question.id,
   });
   if (res.code === 0) {
-    message.success("删除成功");
+    message.success("Delete successful");
     loadData();
   } else {
-    message.error("删除失败");
+    message.error("Delete failed");
   }
 };
 

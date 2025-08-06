@@ -4,15 +4,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 /**
- * 题目提交枚举
+ * Question submission enumeration
  *
  */
 public enum QuestionSubmitStatusEnum {
-    // 0 - 待判题、1 - 判题中、2 - 成功、3 - 失败
-    WAITING("等待中", 0),
-    RUNNING("判题中", 1),
-    SUCCEED("成功", 2),
-    FAILED("失败", 3);
+    // 0 - Waiting for judgment, 1 - Judging, 2 - Success, 3 - Failed
+    WAITING("Waiting", 0),
+    RUNNING("Judging", 1),
+    SUCCEED("Success", 2),
+    FAILED("Failed", 3);
     private final String text;
     private final Integer value;
     QuestionSubmitStatusEnum(String text, Integer value) {
@@ -20,7 +20,7 @@ public enum QuestionSubmitStatusEnum {
         this.value = value;
     }
     /**
-     * 获取值列表
+     * Get value list
      *
      * @return
      */
@@ -28,7 +28,7 @@ public enum QuestionSubmitStatusEnum {
         return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
     }
     /**
-     * 根据 value 获取枚举
+     * Get enum by value
      *
      * @param value
      * @return

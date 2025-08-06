@@ -1,12 +1,12 @@
 package com.yupi.yuojbackendcommon.constant;
 /**
- * 文件常量
+ * File constants
  *
  */
 public interface FileConstant {
     /**
-     * COS 访问地址
-     * todo 需替换配置
+     * COS access address
+     * todo need to replace configuration
      */
     String COS_HOST = "https://yupi.icu";
 }

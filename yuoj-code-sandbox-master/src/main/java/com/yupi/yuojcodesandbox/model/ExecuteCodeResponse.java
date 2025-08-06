@@ -16,17 +16,17 @@ public class ExecuteCodeResponse {
     private List<String> outputList;
 
     /**
-     * 接口信息
+     * Interface information
      */
     private String message;
 
     /**
-     * 执行状态
+     * Execution status
      */
     private Integer status;
 
     /**
-     * 判题信息
+     * Judge information
      */
     private JudgeInfo judgeInfo;
 }

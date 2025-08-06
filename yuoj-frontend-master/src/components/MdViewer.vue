@@ -9,7 +9,7 @@ import { Viewer } from "@bytemd/vue-next";
 import { withDefaults, defineProps } from "vue";
 
 /**
- * 定义组件属性类型
+ * Define component property types
  */
 interface Props {
   value: string;
@@ -22,7 +22,7 @@ const plugins = [
 ];
 
 /**
- * 给组件指定初始值
+ * Specify initial values for component
  */
 const props = withDefaults(defineProps<Props>(), {
   value: () => "",

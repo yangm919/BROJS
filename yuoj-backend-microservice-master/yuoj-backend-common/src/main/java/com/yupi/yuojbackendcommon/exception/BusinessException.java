@@ -1,11 +1,11 @@
 package com.yupi.yuojbackendcommon.exception;
 import com.yupi.yuojbackendcommon.common.ErrorCode;
 /**
- * 自定义异常类
+ * Custom exception class
  */
 public class BusinessException extends RuntimeException {
     /**
-     * 错误码
+     * Error code
      */
     private final int code;
     public BusinessException(int code, String message) {

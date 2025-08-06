@@ -44,7 +44,7 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
     }
 
     /**
-     * 3、创建容器，把文件复制到容器内
+     * 3. Create container and copy files to container
      * @param userCodeFile
      * @param inputList
      * @return
@@ -52,17 +52,17 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
     @Override
     public List<ExecuteMessage> runFile(File userCodeFile, List<String> inputList) {
         String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
-        // 获取默认的 Docker Client
+        // Get default Docker Client
         DockerClient dockerClient = DockerClientBuilder.getInstance().build();
 
-        // 拉取镜像
+        // Pull image
         String image = "openjdk:8-alpine";
         if (FIRST_INIT) {
             PullImageCmd pullImageCmd = dockerClient.pullImageCmd(image);
             PullImageResultCallback pullImageResultCallback = new PullImageResultCallback() {
                 @Override
                 public void onNext(PullResponseItem item) {
-                    System.out.println("下载镜像：" + item.getStatus());
+                    System.out.println("Downloading image: " + item.getStatus());
                     super.onNext(item);
                 }
             };
@@ -71,21 +71,21 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
                         .exec(pullImageResultCallback)
                         .awaitCompletion();
             } catch (InterruptedException e) {
-                System.out.println("拉取镜像异常");
+                System.out.println("Exception pulling image");
                 throw new RuntimeException(e);
             }
         }
 
-        System.out.println("下载完成");
+        System.out.println("Download completed");
 
-        // 创建容器
+        // Create container
 
         CreateContainerCmd containerCmd = dockerClient.createContainerCmd(image);
         HostConfig hostConfig = new HostConfig();
         hostConfig.withMemory(100 * 1000 * 1000L);
         hostConfig.withMemorySwap(0L);
         hostConfig.withCpuCount(1L);
-        hostConfig.withSecurityOpts(Arrays.asList("seccomp=安全管理配置字符串"));
+        hostConfig.withSecurityOpts(Arrays.asList("seccomp=security management configuration string"));
         hostConfig.setBinds(new Bind(userCodeParentPath, new Volume("/app")));
         CreateContainerResponse createContainerResponse = containerCmd
                 .withHostConfig(hostConfig)
@@ -99,11 +99,11 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
         System.out.println(createContainerResponse);
         String containerId = createContainerResponse.getId();
 
-        // 启动容器
+        // Start container
         dockerClient.startContainerCmd(containerId).exec();
 
         // docker exec keen_blackwell java -cp /app Main 1 3
-        // 执行命令并获取结果
+        // Execute command and get result
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
             StopWatch stopWatch = new StopWatch();
@@ -115,19 +115,19 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
                     .withAttachStdin(true)
                     .withAttachStdout(true)
                     .exec();
-            System.out.println("创建执行命令：" + execCreateCmdResponse);
+            System.out.println("Create execution command: " + execCreateCmdResponse);
 
             ExecuteMessage executeMessage = new ExecuteMessage();
             final String[] message = {null};
             final String[] errorMessage = {null};
             long time = 0L;
-            // 判断是否超时
+            // Check if timeout
             final boolean[] timeout = {true};
             String execId = execCreateCmdResponse.getId();
             ExecStartResultCallback execStartResultCallback = new ExecStartResultCallback() {
                 @Override
                 public void onComplete() {
-                    // 如果执行完成，则表示没超时
+                    // If execution completes, then no timeout
                     timeout[0] = false;
                     super.onComplete();
                 }

@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.lang.Thread;
 
 /**
- * 第三方代码沙箱（调用Judge0 API）
+ * Third-party code sandbox (calls Judge0 API)
  */
 @Slf4j
 @Component
@@ -47,58 +47,59 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
 
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) {
-        log.info("开始执行代码，语言：{}", executeCodeRequest.getLanguage());
+        log.info("=== ThirdPartyCodeSandbox.executeCode called ===");
+        log.info("Starting code execution, language: {}", executeCodeRequest.getLanguage());
         
         try {
-            // 测试Judge0 API连接
+            // Test Judge0 API connection
             if (!testJudge0Connection()) {
-                log.error("Judge0 API连接失败");
-                return createErrorResponse("Judge0 API连接失败");
+                log.error("Judge0 API connection failed");
+                return createErrorResponse("Judge0 API connection failed");
             }
             
-            // 处理多个测试用例
+            // Process multiple test cases
             List<String> outputList = new ArrayList<>();
             List<String> inputList = executeCodeRequest.getInputList();
             
             if (inputList == null || inputList.isEmpty()) {
-                return createErrorResponse("没有测试用例");
+                return createErrorResponse("No test cases");
             }
             
-            // 保存最后一个测试用例的结果，用于提取内存和时间信息
+            // Save the last test case result for extracting memory and time information
             Judge0ResultResponse lastResult = null;
             
-            // 为每个测试用例执行代码
+            // Execute code for each test case
             for (int i = 0; i < inputList.size(); i++) {
                 String input = inputList.get(i);
-                log.info("执行第{}个测试用例，输入：{}", i + 1, input);
+                log.info("Executing test case {}, input: {}", i + 1, input);
                 
-                // 1. 提交代码到Judge0
+                // 1. Submit code to Judge0
                 String token = submitCode(executeCodeRequest, input);
                 if (token == null) {
-                    return createErrorResponse("代码提交失败");
+                    return createErrorResponse("Code submission failed");
                 }
                 
-                // 2. 轮询获取执行结果
+                // 2. Poll for execution results
                 Judge0ResultResponse result = pollResult(token);
                 if (result == null) {
-                    return createErrorResponse("获取执行结果失败");
+                    return createErrorResponse("Failed to get execution results");
                 }
                 
-                // 保存最后一个结果
+                // Save the last result
                 lastResult = result;
                 
-                // 3. 处理单个测试用例的结果
+                // 3. Process single test case result
                 String output = processSingleResult(result);
                 if (output != null) {
                     outputList.add(output);
                 } else {
-                    return createErrorResponse("第" + (i + 1) + "个测试用例执行失败");
+                    return createErrorResponse("Test case " + (i + 1) + " execution failed");
                 }
                 
-                // 4. 在测试用例之间添加延迟，避免触发限流
+                // 4. Add delay between test cases to avoid rate limiting
                 if (i < inputList.size() - 1) {
                     try {
-                        log.info("等待1秒后执行下一个测试用例...");
+                        log.info("Waiting 1 second before executing next test case...");
                         Thread.sleep(1000L);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
@@ -107,369 +108,257 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
                 }
             }
             
-            // 4. 构建最终响应 - 使用最后一个测试用例的内存和时间信息
-            JudgeInfo finalJudgeInfo = new JudgeInfo();
+            // 4. Build final response using the last result to get memory and time information
+            ExecuteCodeResponse finalResponse;
             if (lastResult != null) {
-                finalJudgeInfo.setMemory(lastResult.getMemory() != null ? lastResult.getMemory().longValue() : 0L);
-                if (lastResult.getTime() != null) {
-                    try {
-                        finalJudgeInfo.setTime((long)(Double.parseDouble(lastResult.getTime()) * 1000)); // 转换为毫秒
-                    } catch (NumberFormatException e) {
-                        log.warn("无法解析时间字段: {}", lastResult.getTime());
-                        finalJudgeInfo.setTime(0L);
-                    }
-                } else {
-                    finalJudgeInfo.setTime(0L);
-                }
-                finalJudgeInfo.setMessage("执行成功");
+                log.info("Processing last result with memory: {}, time: {}", lastResult.getMemory(), lastResult.getTime());
+                finalResponse = processResult(lastResult, executeCodeRequest);
+                // Update the output list with all test case results
+                finalResponse.setOutputList(outputList);
+                log.info("Final response before return - judgeInfo: {}", finalResponse.getJudgeInfo());
             } else {
-                finalJudgeInfo.setMemory(0L);
-                finalJudgeInfo.setTime(0L);
-                finalJudgeInfo.setMessage("执行成功");
+                finalResponse = createErrorResponse("No execution results");
             }
             
-            return ExecuteCodeResponse.builder()
-                    .outputList(outputList)
-                    .message("执行成功")
-                    .status(0)
-                    .judgeInfo(finalJudgeInfo)
-                    .build();
+            log.info("ThirdPartyCodeSandbox.executeCode returning final response: {}", finalResponse);
+            return finalResponse;
             
         } catch (Exception e) {
-            log.error("代码执行异常", e);
-            return createErrorResponse("代码执行异常：" + e.getMessage());
+            log.error("Code execution exception", e);
+            return createErrorResponse("Code execution failed: " + e.getMessage());
         }
     }
-    
+
     /**
-     * 测试Judge0 API连接
+     * Test Judge0 API connection
      */
     private boolean testJudge0Connection() {
         try {
-            log.info("测试Judge0 API连接...");
-            
-            // 尝试获取语言列表来测试连接
             String response = webClient.get()
                     .uri("/languages")
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            
-            log.info("Judge0 API连接测试响应: {}", response != null ? response.substring(0, Math.min(200, response.length())) + "..." : "null");
-            
-            return response != null && !response.contains("error");
-            
+            return response != null && !response.isEmpty();
         } catch (Exception e) {
-            log.error("Judge0 API连接测试失败", e);
+            log.error("Judge0 API connection test failed", e);
             return false;
         }
     }
-    
+
     /**
-     * 提交代码到Judge0
+     * Submit code to Judge0
      */
     private String submitCode(ExecuteCodeRequest request, String input) {
-        int maxRetries = 3;
-        int retryCount = 0;
-        
-        while (retryCount < maxRetries) {
-            try {
-                // 构建Judge0提交请求
-                Judge0SubmissionRequest judge0Request = Judge0SubmissionRequest.builder()
-                        .source_code(request.getCode())
-                        .language_id(Judge0LanguageMapper.getLanguageId(request.getLanguage()))
-                        .stdin(input)
-                        .cpu_time_limit(5) // 5秒时间限制
-                        .memory_limit(256000) // 256MB内存限制
-                        .enable_network(false) // 禁用网络
-                        .build();
-                
-                log.info("提交代码到Judge0，语言ID：{}，输入：{}，重试次数：{}", 
-                        judge0Request.getLanguage_id(), judge0Request.getStdin(), retryCount + 1);
-                
-                // 发送HTTP请求
-                Judge0SubmissionResponse response = webClient.post()
-                        .uri("/submissions")
-                        .bodyValue(judge0Request)
-                        .retrieve()
-                        .bodyToMono(Judge0SubmissionResponse.class)
-                        .block();
-                
-                if (response != null && response.getToken() != null) {
-                    log.info("代码提交成功，token：{}", response.getToken());
-                    return response.getToken();
-                } else {
-                    log.error("代码提交失败，响应为空");
-                    return null;
-                }
-                
-            } catch (WebClientResponseException.TooManyRequests e) {
-                log.warn("Judge0 API限流，等待重试... (重试 {}/{})", retryCount + 1, maxRetries);
-                retryCount++;
-                
-                if (retryCount < maxRetries) {
-                    try {
-                        // 指数退避：等待时间递增
-                        int waitTime = retryCount * 2; // 2秒, 4秒, 6秒
-                        log.info("等待{}秒后重试...", waitTime);
-                        Thread.sleep(waitTime * 1000L);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        break;
-                    }
-                } else {
-                    log.error("Judge0 API限流，已达到最大重试次数");
-                    return null;
-                }
-            } catch (Exception e) {
-                log.error("提交代码异常", e);
+        try {
+            // Get language ID
+            Integer languageId = Judge0LanguageMapper.getLanguageId(request.getLanguage());
+            
+            // Create submission request
+            Judge0SubmissionRequest submissionRequest = new Judge0SubmissionRequest();
+            submissionRequest.setLanguage_id(languageId);
+            submissionRequest.setSource_code(request.getCode());
+            submissionRequest.setStdin(input);
+            
+            log.info("Submitting code to Judge0, language ID: {}, input: {}, retry count: {}", 
+                    languageId, input, 1);
+            
+            // Submit to Judge0
+            Judge0SubmissionResponse response = webClient.post()
+                    .uri("/submissions")
+                    .body(Mono.just(submissionRequest), Judge0SubmissionRequest.class)
+                    .retrieve()
+                    .bodyToMono(Judge0SubmissionResponse.class)
+                    .block();
+            
+            if (response != null && response.getToken() != null) {
+                log.info("Code submission successful, token: {}", response.getToken());
+                return response.getToken();
+            } else {
+                log.error("Code submission failed, response: {}", response);
                 return null;
             }
+            
+        } catch (Exception e) {
+            log.error("Code submission exception", e);
+            return null;
         }
-        
-        return null;
     }
-    
+
     /**
-     * 轮询获取执行结果
+     * Poll for execution results
      */
     private Judge0ResultResponse pollResult(String token) {
-        int maxRetries = judge0Config.getMaxRetries();
-        int retryCount = 0;
-        
-        log.info("开始轮询Judge0结果，token: {}, 最大重试次数: {}", token, maxRetries);
-        
-        while (retryCount < maxRetries) {
-            try {
-                log.info("第{}次轮询Judge0结果", retryCount + 1);
+        try {
+            log.info("Starting to poll Judge0 results, token: {}, max retries: {}", 
+                    token, judge0Config.getMaxRetries());
+            
+            for (int i = 1; i <= judge0Config.getMaxRetries(); i++) {
+                log.info("Polling Judge0 results, attempt {}", i);
                 
-                // 先获取原始响应字符串
-                String rawResponse = webClient.get()
-                        .uri("/submissions/{token}", token)
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .block();
-                
-                log.info("Judge0原始响应: {}", rawResponse);
-                
-                // 然后解析为对象
                 Judge0ResultResponse result = webClient.get()
-                        .uri("/submissions/{token}", token)
+                        .uri("/submissions/" + token)
                         .retrieve()
                         .bodyToMono(Judge0ResultResponse.class)
                         .block();
                 
-                if (result != null) {
-                    log.info("获取到Judge0响应 - 状态: {}", result.getStatus());
+                if (result != null && result.getStatus() != null) {
+                    log.info("Received Judge0 response - status: {}", result.getStatus());
                     
-                    // 检查执行状态
-                    if (result.getStatus() != null && result.getStatus().getId() != null) {
-                        // 状态ID 1-2 表示正在处理，3-9 表示已完成
-                        if (result.getStatus().getId() >= 3) {
-                            log.info("代码执行完成，状态：{}", result.getStatus().getDescription());
-                            // 检查是否包含内存和时间信息
-                            if (result.getMemory() != null && result.getTime() != null) {
-                                log.info("获取到完整结果，内存：{}，时间：{}", result.getMemory(), result.getTime());
-                                return result;
-                            } else {
-                                log.info("结果不完整，内存：{}，时间：{}，继续等待...", result.getMemory(), result.getTime());
-                            }
-                        } else {
-                            log.info("代码正在处理中，状态：{}", result.getStatus().getDescription());
+                    // Check if processing is complete
+                    if (result.getStatus().getId() == 3) { // Accepted
+                        log.info("Code execution completed, status: Accepted");
+                        return result;
+                    } else if (result.getStatus().getId() == 4) { // Wrong Answer
+                        log.info("Code execution completed, status: Wrong Answer");
+                        return result;
+                    } else if (result.getStatus().getId() == 5) { // Time Limit Exceeded
+                        log.info("Code execution completed, status: Time Limit Exceeded");
+                        return result;
+                    } else if (result.getStatus().getId() == 6) { // Compilation Error
+                        log.info("Code execution completed, status: Compilation Error");
+                        return result;
+                    } else if (result.getStatus().getId() == 1 || result.getStatus().getId() == 2) {
+                        // Still processing
+                        log.info("Code is still processing, status: {}", result.getStatus().getDescription());
+                        try {
+                            Thread.sleep(2000L); // Wait 2 seconds before next poll
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            break;
                         }
                     } else {
-                        log.warn("Judge0响应中状态为空");
+                        log.error("Unknown status: {}", result.getStatus());
+                        return result;
                     }
                 } else {
-                    log.warn("Judge0响应为空");
-                }
-                
-                // 等待2秒后重试
-                TimeUnit.SECONDS.sleep(2);
-                retryCount++;
-                
-            } catch (Exception e) {
-                log.error("第{}次轮询结果异常", retryCount + 1, e);
-                retryCount++;
-                // 异常时等待更长时间
-                try {
-                    TimeUnit.SECONDS.sleep(3);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    break;
+                    log.error("Invalid response from Judge0");
+                    return null;
                 }
             }
-        }
-        
-        log.error("轮询超时，token：{}，已重试{}次", token, maxRetries);
-        return null;
-    }
-    
-    /**
-     * 处理单个Judge0执行结果
-     */
-    private String processSingleResult(Judge0ResultResponse result) {
-        log.info("处理单个Judge0结果 - 状态: {}", result.getStatus());
-        log.info("标准输出: '{}'", result.getStdout());
-        log.info("标准错误: '{}'", result.getStderr());
-        log.info("编译输出: '{}'", result.getCompile_output());
-        
-        // 检查执行状态
-        if (result.getStatus() != null && result.getStatus().getId() != null) {
-            switch (result.getStatus().getId()) {
-                case 3: // Accepted
-                    log.info("Judge0状态: Accepted");
-                    break;
-                case 4: // Wrong Answer
-                    log.error("Judge0状态: Wrong Answer");
-                    return null;
-                case 5: // Compilation Error
-                    log.error("Judge0状态: Compilation Error");
-                    return null;
-                case 6: // Runtime Error
-                    log.error("Judge0状态: Runtime Error");
-                    return null;
-                case 7: // Time Limit Exceeded
-                    log.warn("Judge0状态: Time Limit Exceeded");
-                    return null;
-                case 8: // Memory Limit Exceeded
-                    log.warn("Judge0状态: Memory Limit Exceeded");
-                    return null;
-                default:
-                    log.error("Judge0状态: 未知错误 - {}", result.getStatus().getId());
-                    return null;
-            }
-        }
-        
-        // 处理标准输出
-        if (result.getStdout() != null && !result.getStdout().trim().isEmpty()) {
-            String trimmedOutput = result.getStdout().trim();
-            log.info("返回输出: '{}'", trimmedOutput);
-            return trimmedOutput;
-        } else {
-            log.warn("标准输出为空或null");
+            
+            log.error("Max retries reached, polling failed");
+            return null;
+            
+        } catch (Exception e) {
+            log.error("Polling exception", e);
             return null;
         }
     }
-    
+
     /**
-     * 处理Judge0执行结果（保留原方法用于兼容）
+     * Process single test case result
+     */
+    private String processSingleResult(Judge0ResultResponse result) {
+        try {
+            log.info("Processing single Judge0 result - status: {}", result.getStatus());
+            
+            // Log detailed information
+            log.info("Standard output: '{}'", result.getStdout());
+            log.info("Standard error: '{}'", result.getStderr());
+            log.info("Compilation output: '{}'", result.getCompile_output());
+            log.info("Judge0 status: {}", result.getStatus().getDescription());
+            
+            // Check if execution was successful
+            if (result.getStatus().getId() == 3) { // Accepted
+                String output = result.getStdout();
+                if (output != null) {
+                    output = output.trim();
+                    log.info("Returned output: '{}'", output);
+                    return output;
+                } else {
+                    log.error("No output for accepted submission");
+                    return null;
+                }
+            } else {
+                log.error("Execution failed with status: {}", result.getStatus().getDescription());
+                return null;
+            }
+            
+        } catch (Exception e) {
+            log.error("Error processing single result", e);
+            return null;
+        }
+    }
+
+    /**
+     * Process result and create final response with memory and time information
      */
     private ExecuteCodeResponse processResult(Judge0ResultResponse result, ExecuteCodeRequest request) {
-        List<String> outputList = new ArrayList<>();
-        
-        log.info("处理Judge0结果 - 状态: {}", result.getStatus());
-        log.info("标准输出: '{}'", result.getStdout());
-        log.info("标准错误: '{}'", result.getStderr());
-        log.info("编译输出: '{}'", result.getCompile_output());
-        
-        // 处理标准输出
-        if (result.getStdout() != null && !result.getStdout().trim().isEmpty()) {
-            String trimmedOutput = result.getStdout().trim();
-            outputList.add(trimmedOutput);
-            log.info("添加输出到列表: '{}'", trimmedOutput);
-        } else {
-            log.warn("标准输出为空或null");
-        }
-        
-        // 构建判题信息
-        JudgeInfo judgeInfo = new JudgeInfo();
-        judgeInfo.setMemory(result.getMemory() != null ? result.getMemory().longValue() : 0L);
-        
-        // 处理时间字段
-        if (result.getTime() != null) {
-            try {
-                judgeInfo.setTime((long)(Double.parseDouble(result.getTime()) * 1000)); // 转换为毫秒
-            } catch (NumberFormatException e) {
-                log.warn("无法解析时间字段: {}", result.getTime());
+        try {
+            log.info("Processing final result with memory and time information");
+            log.info("Judge0ResultResponse - memory: {}, time: {}, status: {}", 
+                    result.getMemory(), result.getTime(), result.getStatus());
+            
+            // 添加更详细的调试信息
+            log.info("Raw Judge0ResultResponse object: {}", result);
+            log.info("Memory field type: {}, value: {}", 
+                    result.getMemory() != null ? result.getMemory().getClass().getSimpleName() : "null", 
+                    result.getMemory());
+            log.info("Time field type: {}, value: {}", 
+                    result.getTime() != null ? result.getTime().getClass().getSimpleName() : "null", 
+                    result.getTime());
+            
+            ExecuteCodeResponse response = new ExecuteCodeResponse();
+            response.setStatus(0); // Success
+            response.setMessage("执行成功");
+            
+            // Create JudgeInfo with memory and time
+            JudgeInfo judgeInfo = new JudgeInfo();
+            judgeInfo.setMessage("执行成功");
+            
+            // Extract memory information
+            if (result.getMemory() != null) {
+                judgeInfo.setMemory(result.getMemory().longValue());
+                log.info("Memory usage: {} KB", result.getMemory());
+            } else {
+                judgeInfo.setMemory(0L);
+                log.warn("Memory information not available");
+            }
+            
+            // Extract time information
+            if (result.getTime() != null) {
+                try {
+                    double timeSeconds = Double.parseDouble(result.getTime());
+                    long timeMillis = (long)(timeSeconds * 1000); // Convert to milliseconds
+                    judgeInfo.setTime(timeMillis);
+                    log.info("Execution time: {} seconds ({} ms)", timeSeconds, timeMillis);
+                } catch (NumberFormatException e) {
+                    log.warn("Unable to parse time field: {}", result.getTime());
+                    judgeInfo.setTime(0L);
+                }
+            } else {
                 judgeInfo.setTime(0L);
+                log.warn("Time information not available");
             }
-        } else {
-            judgeInfo.setTime(0L);
+            
+            response.setJudgeInfo(judgeInfo);
+            
+            log.info("Final response created with judgeInfo: {}", judgeInfo);
+            return response;
+            
+        } catch (Exception e) {
+            log.error("Error processing final result", e);
+            return createErrorResponse("Error processing result: " + e.getMessage());
         }
-        
-        // 根据状态ID设置消息
-        String message = "执行成功";
-        Integer status = 0; // 成功状态
-        
-        if (result.getStatus() != null && result.getStatus().getId() != null) {
-            switch (result.getStatus().getId()) {
-                case 3: // Accepted
-                    message = "执行成功";
-                    status = 0;
-                    log.info("Judge0状态: Accepted");
-                    break;
-                case 4: // Wrong Answer
-                    message = "答案错误";
-                    status = 1;
-                    log.info("Judge0状态: Wrong Answer");
-                    break;
-                case 5: // Compilation Error
-                    message = "编译错误";
-                    status = 2;
-                    if (result.getCompile_output() != null) {
-                        message += ": " + result.getCompile_output();
-                    }
-                    log.error("Judge0状态: Compilation Error - {}", message);
-                    break;
-                case 6: // Runtime Error
-                    message = "运行时错误";
-                    status = 3;
-                    if (result.getStderr() != null) {
-                        message += ": " + result.getStderr();
-                    }
-                    log.error("Judge0状态: Runtime Error - {}", message);
-                    break;
-                case 7: // Time Limit Exceeded
-                    message = "时间超限";
-                    status = 4;
-                    log.warn("Judge0状态: Time Limit Exceeded");
-                    break;
-                case 8: // Memory Limit Exceeded
-                    message = "内存超限";
-                    status = 5;
-                    log.warn("Judge0状态: Memory Limit Exceeded");
-                    break;
-                default:
-                    message = "未知错误";
-                    status = 6;
-                    log.error("Judge0状态: 未知错误 - {}", result.getStatus().getId());
-                    break;
-            }
-        }
-        
-        // 如果有标准错误输出，添加到消息中
-        if (result.getStderr() != null && !result.getStderr().trim().isEmpty()) {
-            message += " - " + result.getStderr().trim();
-        }
-        
-        judgeInfo.setMessage(message);
-        
-        log.info("最终输出列表大小: {}", outputList.size());
-        log.info("最终消息: {}", message);
-        
-        return ExecuteCodeResponse.builder()
-                .outputList(outputList)
-                .message(message)
-                .status(status)
-                .judgeInfo(judgeInfo)
-                .build();
     }
-    
+
     /**
-     * 创建错误响应
+     * Create error response
      */
     private ExecuteCodeResponse createErrorResponse(String errorMessage) {
+        log.error("Creating error response: {}", errorMessage);
+        
+        ExecuteCodeResponse response = new ExecuteCodeResponse();
+        response.setStatus(1); // Error
+        response.setMessage(errorMessage);
+        
         JudgeInfo judgeInfo = new JudgeInfo();
-        judgeInfo.setMessage(errorMessage);
+        judgeInfo.setMessage("执行失败");
         judgeInfo.setMemory(0L);
         judgeInfo.setTime(0L);
+        response.setJudgeInfo(judgeInfo);
         
-        return ExecuteCodeResponse.builder()
-                .outputList(new ArrayList<>())
-                .message(errorMessage)
-                .status(6) // 系统错误
-                .judgeInfo(judgeInfo)
-                .build();
+        return response;
     }
-}
+} 

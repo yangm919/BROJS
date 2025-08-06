@@ -3,6 +3,7 @@ package com.yupi.yuojbackendjudgeservice.judge.codesandbox;
 import com.yupi.yuojbackendjudgeservice.config.Judge0Config;
 import com.yupi.yuojbackendjudgeservice.judge.codesandbox.impl.ExampleCodeSandbox;
 import com.yupi.yuojbackendjudgeservice.judge.codesandbox.impl.RemoteCodeSandbox;
+import com.yupi.yuojbackendjudgeservice.judge.codesandbox.impl.Main;
 import com.yupi.yuojbackendjudgeservice.judge.codesandbox.impl.ThirdPartyCodeSandbox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

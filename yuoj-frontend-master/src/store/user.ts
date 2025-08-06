@@ -7,42 +7,42 @@ export default {
   namespaced: true,
   state: () => ({
     loginUser: {
-      userName: "未登录",
+      userName: "Not Logged In",
       userRole: ACCESS_ENUM.NOT_LOGIN,
     },
   }),
   actions: {
     async getLoginUser({ commit, state }, payload) {
-      // 从远程请求获取登录信息
+      // Get login information from remote request
       const res = await UserControllerService.getLoginUserUsingGet();
       if (res.code === 0) {
         commit("updateUser", res.data);
       } else {
         commit("updateUser", {
-          userName: "未登录",
+          userName: "Not Logged In",
           userRole: ACCESS_ENUM.NOT_LOGIN,
         });
       }
     },
 
     /**
-     * 登出用户
+     * Logout user
      */
     async logoutUser({ commit }) {
       try {
-        // 这里可以调用后端的登出接口
+        // Here you can call the backend logout interface
         // const res = await UserControllerService.userLogoutUsingPost();
 
-        // 清除用户状态
+        // Clear user state
         commit("updateUser", {
-          userName: "未登录",
+          userName: "Not Logged In",
           userRole: ACCESS_ENUM.NOT_LOGIN,
         });
       } catch (error) {
-        console.error("登出失败:", error);
-        // 即使后端调用失败，也要清除本地状态
+        console.error("Logout failed:", error);
+        // Even if backend call fails, clear local state
         commit("updateUser", {
-          userName: "未登录",
+          userName: "Not Logged In",
           userRole: ACCESS_ENUM.NOT_LOGIN,
         });
       }

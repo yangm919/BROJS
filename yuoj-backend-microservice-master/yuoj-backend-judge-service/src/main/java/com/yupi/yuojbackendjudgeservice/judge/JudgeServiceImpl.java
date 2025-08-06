@@ -88,6 +88,9 @@ public class JudgeServiceImpl implements JudgeService {
         log.info("judgeMessage: {}", judgeMessage);
         if ("Accepted".equals(judgeMessage)) {
             questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEED.getValue());
+            // 更新问题的通过数
+            question.setAcceptedNum(question.getAcceptedNum() == null ? 1 : question.getAcceptedNum() + 1);
+            questionFeignClient.updateQuestionById(question);
         } else {
             questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.FAILED.getValue());
         }

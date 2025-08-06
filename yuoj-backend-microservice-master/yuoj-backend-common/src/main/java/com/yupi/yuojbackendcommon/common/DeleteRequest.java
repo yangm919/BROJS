@@ -2,7 +2,7 @@ package com.yupi.yuojbackendcommon.common;
 import lombok.Data;
 import java.io.Serializable;
 /**
- * 删除请求
+ * Delete request
  *
  */
 @Data

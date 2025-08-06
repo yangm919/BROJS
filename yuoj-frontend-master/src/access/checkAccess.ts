@@ -1,27 +1,27 @@
 import ACCESS_ENUM from "@/access/accessEnum";
 
 /**
- * 检查权限（判断当前登录用户是否具有某个权限）
- * @param loginUser 当前登录用户
- * @param needAccess 需要有的权限
- * @return boolean 有无权限
+ * Check permissions (determine if the current logged-in user has a certain permission)
+ * @param loginUser Current logged-in user
+ * @param needAccess Required permission
+ * @return boolean Whether has permission
  */
 const checkAccess = (loginUser: any, needAccess = ACCESS_ENUM.NOT_LOGIN) => {
-  // 获取当前登录用户具有的权限（如果没有 loginUser，则表示未登录）
+  // Get the permission of the current logged-in user (if there is no loginUser, it means not logged in)
   const loginUserAccess = loginUser?.userRole ?? ACCESS_ENUM.NOT_LOGIN;
   if (needAccess === ACCESS_ENUM.NOT_LOGIN) {
     return true;
   }
-  // 如果用户登录才能访问
+  // If user login is required to access
   if (needAccess === ACCESS_ENUM.USER) {
-    // 如果用户没登录，那么表示无权限
+    // If user is not logged in, it means no permission
     if (loginUserAccess === ACCESS_ENUM.NOT_LOGIN) {
       return false;
     }
   }
-  // 如果需要管理员权限
+  // If admin permission is required
   if (needAccess === ACCESS_ENUM.ADMIN) {
-    // 如果不为管理员，表示无权限
+    // If not admin, it means no permission
     if (loginUserAccess !== ACCESS_ENUM.ADMIN) {
       return false;
     }

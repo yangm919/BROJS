@@ -1,4 +1,4 @@
--- 添加测试提交
+-- Add test submission
 INSERT INTO `question_submit` (
     `language`, 
     `code`, 

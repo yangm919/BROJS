@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    管理员可见
+    Admin Only
     <img alt="Bingrui logo" src="../assets/bingrui-logo.svg" />
     <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
   </div>

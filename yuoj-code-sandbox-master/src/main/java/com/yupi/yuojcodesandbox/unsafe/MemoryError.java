@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 无限占用空间（浪费系统内存）
+ * Infinite memory occupation (waste system memory)
  */
 public class MemoryError {
 

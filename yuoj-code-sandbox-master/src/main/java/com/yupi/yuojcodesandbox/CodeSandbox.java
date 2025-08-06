@@ -5,12 +5,12 @@ import com.yupi.yuojcodesandbox.model.ExecuteCodeRequest;
 import com.yupi.yuojcodesandbox.model.ExecuteCodeResponse;
 
 /**
- * 代码沙箱接口定义
+ * Code sandbox interface definition
  */
 public interface CodeSandbox {
 
     /**
-     * 执行代码
+     * Execute code
      *
      * @param executeCodeRequest
      * @return

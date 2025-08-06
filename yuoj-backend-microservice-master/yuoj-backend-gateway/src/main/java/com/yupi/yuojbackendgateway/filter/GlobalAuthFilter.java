@@ -19,19 +19,19 @@ public class GlobalAuthFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest serverHttpRequest = exchange.getRequest();
         String path = serverHttpRequest.getURI().getPath();
-        // 判断路径中是否包含 inner，只允许内部调用
+        // Check if path contains inner, only allow internal calls
         if (antPathMatcher.match("/**/inner/**", path)) {
             ServerHttpResponse response = exchange.getResponse();
             response.setStatusCode(HttpStatus.FORBIDDEN);
             DataBufferFactory dataBufferFactory = response.bufferFactory();
-            DataBuffer dataBuffer = dataBufferFactory.wrap("无权限".getBytes(StandardCharsets.UTF_8));
+            DataBuffer dataBuffer = dataBufferFactory.wrap("No permission".getBytes(StandardCharsets.UTF_8));
             return response.writeWith(Mono.just(dataBuffer));
         }
-        // todo 统一权限校验，通过 JWT 获取登录用户信息
+        // todo Unified permission validation, get login user info through JWT
         return chain.filter(exchange);
     }
     /**
-     * 优先级提到最高
+     * Set priority to highest
      * @return
      */
     @Override

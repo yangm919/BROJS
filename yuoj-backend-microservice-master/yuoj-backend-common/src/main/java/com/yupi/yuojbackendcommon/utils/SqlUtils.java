@@ -1,12 +1,12 @@
 package com.yupi.yuojbackendcommon.utils;
 import org.apache.commons.lang3.StringUtils;
 /**
- * SQL 工具
+ * SQL utilities
  *
  */
 public class SqlUtils {
     /**
-     * 校验排序字段是否合法（防止 SQL 注入）
+     * Validate if sort field is legal (prevent SQL injection)
      *
      * @param sortField
      * @return
