@@ -47,6 +47,7 @@ public class QuestionInnerController implements QuestionFeignClient {
      * @return 用户统计信息
      */
     @GetMapping("/get/user/statistics")
+    @Override
     public UserStatisticsVO getUserStatistics(@RequestParam("userId") long userId) {
         UserStatisticsVO statisticsVO = new UserStatisticsVO();
         statisticsVO.setUserId(userId);

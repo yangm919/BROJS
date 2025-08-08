@@ -1,16 +1,16 @@
 package com.yupi.yuojbackendmodel.model.dto.question;
 import lombok.Data;
 /**
- * Question test case
+ * 题目用例
  */
 @Data
 public class JudgeCase {
     /**
-     * Input case
+     * 输入用例
      */
     private String input;
     /**
-     * Output case
+     * 输出用例
      */
     private String output;
 }

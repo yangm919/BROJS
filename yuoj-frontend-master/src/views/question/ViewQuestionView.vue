@@ -10,13 +10,13 @@
                 :column="{ xs: 1, md: 2, lg: 3 }"
               >
                 <a-descriptions-item label="Time Limit">
-                  {{ question.judgeConfig.timeLimit ?? 0 }}
+                  {{ question.judgeConfig?.timeLimit ?? 0 }}
                 </a-descriptions-item>
                 <a-descriptions-item label="Memory Limit">
-                  {{ question.judgeConfig.memoryLimit ?? 0 }}
+                  {{ question.judgeConfig?.memoryLimit ?? 0 }}
                 </a-descriptions-item>
                 <a-descriptions-item label="Stack Limit">
-                  {{ question.judgeConfig.stackLimit ?? 0 }}
+                  {{ question.judgeConfig?.stackLimit ?? 0 }}
                 </a-descriptions-item>
               </a-descriptions>
               <MdViewer :value="question.content || ''" />

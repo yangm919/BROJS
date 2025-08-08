@@ -38,8 +38,8 @@ public class Judge0UsageExample {
                 .build();
 
         ExecuteCodeResponse response = codeSandbox.executeCode(request);
-        log.info("Java执行结果: {}", response.getMessage());
-        log.info("输出: {}", response.getOutputList());
+        log.info("Java execution result: {}", response.getMessage());
+        log.info("Output: {}", response.getOutputList());
     }
 
     /**
@@ -65,8 +65,8 @@ public class Judge0UsageExample {
                 .build();
 
         ExecuteCodeResponse response = codeSandbox.executeCode(request);
-        log.info("Python执行结果: {}", response.getMessage());
-        log.info("输出: {}", response.getOutputList());
+        log.info("Python execution result: {}", response.getMessage());
+        log.info("Output: {}", response.getOutputList());
     }
 
     /**
@@ -96,8 +96,8 @@ public class Judge0UsageExample {
                 .build();
 
         ExecuteCodeResponse response = codeSandbox.executeCode(request);
-        log.info("C++执行结果: {}", response.getMessage());
-        log.info("输出: {}", response.getOutputList());
+        log.info("C++ execution result: {}", response.getMessage());
+        log.info("Output: {}", response.getOutputList());
     }
 
     /**
@@ -108,12 +108,12 @@ public class Judge0UsageExample {
                 "console.log(\"Hello from JavaScript!\");\n" +
                 "console.log(\"1 + 2 =\", 1 + 2);\n" +
                 "\n" +
-                "// 数组操作\n" +
+                "// Array operation\n" +
                 "const numbers = [1, 2, 3, 4, 5];\n" +
                 "const sum = numbers.reduce((acc, num) => acc + num, 0);\n" +
                 "console.log(\"Sum of numbers:\", sum);\n" +
                 "\n" +
-                "// 函数示例\n" +
+                "// Function example\n" +
                 "function factorial(n) {\n" +
                 "    if (n <= 1) return 1;\n" +
                 "    return n * factorial(n - 1);\n" +
@@ -127,8 +127,8 @@ public class Judge0UsageExample {
                 .build();
 
         ExecuteCodeResponse response = codeSandbox.executeCode(request);
-        log.info("JavaScript执行结果: {}", response.getMessage());
-        log.info("输出: {}", response.getOutputList());
+        log.info("JavaScript execution result: {}", response.getMessage());
+        log.info("Output: {}", response.getOutputList());
     }
 
     /**
@@ -138,11 +138,11 @@ public class Judge0UsageExample {
         String pythonCode =
                 "import sys\n" +
                 "\n" +
-                "# 读取输入\n" +
+                "# Read input\n" +
                 "input_data = input().strip()\n" +
                 "print(f\"Received input: {input_data}\")\n" +
                 "\n" +
-                "# 处理输入\n" +
+                "# Process input\n" +
                 "try:\n" +
                 "    number = int(input_data)\n" +
                 "    result = number * 2\n" +
@@ -157,8 +157,8 @@ public class Judge0UsageExample {
                 .build();
 
         ExecuteCodeResponse response = codeSandbox.executeCode(request);
-        log.info("带输入执行结果: {}", response.getMessage());
-        log.info("输出: {}", response.getOutputList());
+        log.info("With input execution result: {}", response.getMessage());
+        log.info("Output: {}", response.getOutputList());
     }
 
     /**
@@ -170,7 +170,7 @@ public class Judge0UsageExample {
                 "public class Main {\n" +
                 "    public static void main(String[] args) {\n" +
                 "        System.out.println(\"Hello World\");\n" +
-                "        // 故意制造编译错误\n" +
+                "        // Make a compilation error\n" +
                 "        undefinedVariable = 10;\n" +
                 "    }\n" +
                 "}\n";
@@ -182,10 +182,10 @@ public class Judge0UsageExample {
                 .build();
 
         ExecuteCodeResponse response = codeSandbox.executeCode(request);
-        log.info("错误代码执行结果: {}", response.getMessage());
-        log.info("状态: {}", response.getStatus());
+        log.info("wrong code execution result: {}", response.getMessage());
+        log.info("status: {}", response.getStatus());
         if (response.getJudgeInfo() != null) {
-            log.info("错误信息: {}", response.getJudgeInfo().getMessage());
+            log.info("error message: {}", response.getJudgeInfo().getMessage());
         }
     }
 
@@ -198,7 +198,7 @@ public class Judge0UsageExample {
                 "\n" +
                 "start_time = time.time()\n" +
                 "\n" +
-                "# 执行一些计算密集型操作\n" +
+                "# Execute some calculation-intensive operations\n" +
                 "result = 0\n" +
                 "for i in range(1000000):\n" +
                 "    result += i\n" +
@@ -206,8 +206,8 @@ public class Judge0UsageExample {
                 "end_time = time.time()\n" +
                 "execution_time = end_time - start_time\n" +
                 "\n" +
-                "print(f\"计算结果: {result}\")\n" +
-                "print(f\"执行时间: {execution_time:.4f} 秒\")\n";
+                "print(f\"Calculation result: {result}\")\n" +
+                "print(f\"Execution time: {execution_time:.4f} seconds\")\n";
 
         ExecuteCodeRequest request = ExecuteCodeRequest.builder()
                 .code(performanceCode)
@@ -216,12 +216,12 @@ public class Judge0UsageExample {
                 .build();
 
         ExecuteCodeResponse response = codeSandbox.executeCode(request);
-        log.info("性能测试结果: {}", response.getMessage());
-        log.info("输出: {}", response.getOutputList());
+        log.info("Performance test result: {}", response.getMessage());
+        log.info("Output: {}", response.getOutputList());
         
         if (response.getJudgeInfo() != null) {
-            log.info("内存使用: {} KB", response.getJudgeInfo().getMemory());
-            log.info("执行时间: {} ms", response.getJudgeInfo().getTime());
+            log.info("Memory usage: {} KB", response.getJudgeInfo().getMemory());
+            log.info("Execution time: {} ms", response.getJudgeInfo().getTime());
         }
     }
 
@@ -229,7 +229,7 @@ public class Judge0UsageExample {
      * 运行所有示例
      */
     public void runAllExamples() {
-        log.info("开始运行Judge0使用示例...");
+        log.info("Start running Judge0 usage examples...");
         
         try {
             executeJavaExample();
@@ -253,9 +253,9 @@ public class Judge0UsageExample {
             executePerformanceTest();
             
         } catch (InterruptedException e) {
-            log.error("示例执行被中断", e);
+            log.error("Example execution interrupted", e);
         }
         
-        log.info("所有示例执行完成");
+        log.info("All examples executed successfully");
     }
 } 

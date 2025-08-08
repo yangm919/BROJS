@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 /**
- * User role enumeration
+ * 用户角色枚举
  *
  */
 public enum UserRoleEnum {
-    USER("User", "user"),
-    ADMIN("Administrator", "admin"),
-    BAN("Banned", "ban");
+    USER("用户", "user"),
+    ADMIN("管理员", "admin"),
+    BAN("被封号", "ban");
     private final String text;
     private final String value;
     UserRoleEnum(String text, String value) {
@@ -18,7 +18,7 @@ public enum UserRoleEnum {
         this.value = value;
     }
     /**
-     * Get value list
+     * 获取值列表
      *
      * @return
      */
@@ -26,7 +26,7 @@ public enum UserRoleEnum {
         return Arrays.stream(values()).map(item -> item.value).collect(Collectors.toList());
     }
     /**
-     * Get enum by value
+     * 根据 value 获取枚举
      *
      * @param value
      * @return

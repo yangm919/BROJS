@@ -180,33 +180,33 @@ public class Main implements CodeSandbox {
                         .block();
                 
                 if (response != null && response.getToken() != null) {
-                    log.info("代码提交成功，token：{}", response.getToken());
+                    log.info("Code submitted successfully, token: {}", response.getToken());
                     return response.getToken();
                 } else {
-                    log.error("代码提交失败，响应为空");
+                    log.error("Code submission failed, response is empty");
                     return null;
                 }
                 
             } catch (WebClientResponseException.TooManyRequests e) {
-                log.warn("Judge0 API限流，等待重试... (重试 {}/{})", retryCount + 1, maxRetries);
+                log.warn("Judge0 API rate limit, waiting for retry... (retry {}/{})", retryCount + 1, maxRetries);
                 retryCount++;
                 
                 if (retryCount < maxRetries) {
                     try {
                         // 指数退避：等待时间递增
                         int waitTime = retryCount * 2; // 2秒, 4秒, 6秒
-                        log.info("等待{}秒后重试...", waitTime);
+                        log.info("Waiting {} seconds before retrying...", waitTime);
                         Thread.sleep(waitTime * 1000L);
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                         break;
                     }
                 } else {
-                    log.error("Judge0 API限流，已达到最大重试次数");
+                    log.error("Judge0 API rate limit, maximum retries reached");
                     return null;
                 }
             } catch (Exception e) {
-                log.error("提交代码异常", e);
+                log.error("Code submission exception", e);
                 return null;
             }
         }
@@ -221,11 +221,11 @@ public class Main implements CodeSandbox {
         int maxRetries = judge0Config.getMaxRetries();
         int retryCount = 0;
         
-        log.info("开始轮询Judge0结果，token: {}, 最大重试次数: {}", token, maxRetries);
+        log.info("Start polling Judge0 results, token: {}, maximum retries: {}", token, maxRetries);
         
         while (retryCount < maxRetries) {
             try {
-                log.info("第{}次轮询Judge0结果", retryCount + 1);
+                log.info("Polling Judge0 results, attempt {}/{}", retryCount + 1, maxRetries);
                 
                 // 先获取原始响应字符串
                 String rawResponse = webClient.get()
@@ -234,7 +234,7 @@ public class Main implements CodeSandbox {
                         .bodyToMono(String.class)
                         .block();
                 
-                log.info("Judge0原始响应: {}", rawResponse);
+                log.info("Judge0 raw response: {}", rawResponse);
                 
                 // 然后解析为对象
                 Judge0ResultResponse result = webClient.get()
@@ -244,28 +244,28 @@ public class Main implements CodeSandbox {
                         .block();
                 
                 if (result != null) {
-                    log.info("获取到Judge0响应 - 状态: {}", result.getStatus());
+                    log.info("Got Judge0 response - status: {}", result.getStatus());
                     
                     // 检查执行状态
                     if (result.getStatus() != null && result.getStatus().getId() != null) {
                         // 状态ID 1-2 表示正在处理，3-9 表示已完成
                         if (result.getStatus().getId() >= 3) {
-                            log.info("代码执行完成，状态：{}", result.getStatus().getDescription());
+                            log.info("Code execution completed, status: {}", result.getStatus().getDescription());
                             // 检查是否包含内存和时间信息
                             if (result.getMemory() != null && result.getTime() != null) {
-                                log.info("获取到完整结果，内存：{}，时间：{}", result.getMemory(), result.getTime());
+                                log.info("Got complete result, memory: {}, time: {}", result.getMemory(), result.getTime());
                                 return result;
                             } else {
-                                log.info("结果不完整，内存：{}，时间：{}，继续等待...", result.getMemory(), result.getTime());
+                                log.info("Result incomplete, memory: {}, time: {}, waiting...", result.getMemory(), result.getTime());
                             }
                         } else {
-                            log.info("代码正在处理中，状态：{}", result.getStatus().getDescription());
+                            log.info("Code is being processed, status: {}", result.getStatus().getDescription());
                         }
                     } else {
-                        log.warn("Judge0响应中状态为空");
+                        log.warn("Judge0 response status is empty");
                     }
                 } else {
-                    log.warn("Judge0响应为空");
+                    log.warn("Judge0 response is empty");
                 }
                 
                 // 等待2秒后重试
@@ -273,7 +273,7 @@ public class Main implements CodeSandbox {
                 retryCount++;
                 
             } catch (Exception e) {
-                log.error("第{}次轮询结果异常", retryCount + 1, e);
+                log.error("Polling result exception, attempt {}/{}", retryCount + 1, maxRetries, e);
                 retryCount++;
                 // 异常时等待更长时间
                 try {
@@ -285,7 +285,7 @@ public class Main implements CodeSandbox {
             }
         }
         
-        log.error("轮询超时，token：{}，已重试{}次", token, maxRetries);
+        log.error("Polling timeout, token: {}, maximum retries: {}", token, maxRetries);
         return null;
     }
     
@@ -293,34 +293,34 @@ public class Main implements CodeSandbox {
      * 处理单个Judge0执行结果
      */
     private String processSingleResult(Judge0ResultResponse result) {
-        log.info("处理单个Judge0结果 - 状态: {}", result.getStatus());
-        log.info("标准输出: '{}'", result.getStdout());
-        log.info("标准错误: '{}'", result.getStderr());
-        log.info("编译输出: '{}'", result.getCompile_output());
+        log.info("Processing single Judge0 result - status: {}", result.getStatus());
+        log.info("Standard output: '{}'", result.getStdout());
+        log.info("Standard error: '{}'", result.getStderr());
+        log.info("Compile output: '{}'", result.getCompile_output());
         
         // 检查执行状态
         if (result.getStatus() != null && result.getStatus().getId() != null) {
             switch (result.getStatus().getId()) {
                 case 3: // Accepted
-                    log.info("Judge0状态: Accepted");
+                    log.info("Judge0 status: Accepted");
                     break;
                 case 4: // Wrong Answer
-                    log.error("Judge0状态: Wrong Answer");
+                    log.error("Judge0 status: Wrong Answer");
                     return null;
                 case 5: // Compilation Error
-                    log.error("Judge0状态: Compilation Error");
+                    log.error("Judge0 status: Compilation Error");
                     return null;
                 case 6: // Runtime Error
-                    log.error("Judge0状态: Runtime Error");
+                    log.error("Judge0 status: Runtime Error");
                     return null;
                 case 7: // Time Limit Exceeded
-                    log.warn("Judge0状态: Time Limit Exceeded");
+                    log.warn("Judge0 status: Time Limit Exceeded");
                     return null;
                 case 8: // Memory Limit Exceeded
-                    log.warn("Judge0状态: Memory Limit Exceeded");
+                    log.warn("Judge0 status: Memory Limit Exceeded");
                     return null;
                 default:
-                    log.error("Judge0状态: 未知错误 - {}", result.getStatus().getId());
+                    log.error("Judge0 status: unknown error - {}", result.getStatus().getId());
                     return null;
             }
         }
@@ -328,10 +328,10 @@ public class Main implements CodeSandbox {
         // 处理标准输出
         if (result.getStdout() != null && !result.getStdout().trim().isEmpty()) {
             String trimmedOutput = result.getStdout().trim();
-            log.info("返回输出: '{}'", trimmedOutput);
+            log.info("Return output: '{}'", trimmedOutput);
             return trimmedOutput;
         } else {
-            log.warn("标准输出为空或null");
+            log.warn("Standard output is empty or null");
             return null;
         }
     }
@@ -342,18 +342,18 @@ public class Main implements CodeSandbox {
     private ExecuteCodeResponse processResult(Judge0ResultResponse result, ExecuteCodeRequest request) {
         List<String> outputList = new ArrayList<>();
         
-        log.info("处理Judge0结果 - 状态: {}", result.getStatus());
-        log.info("标准输出: '{}'", result.getStdout());
-        log.info("标准错误: '{}'", result.getStderr());
-        log.info("编译输出: '{}'", result.getCompile_output());
+        log.info("Processing Judge0 result - status: {}", result.getStatus());
+        log.info("Standard output: '{}'", result.getStdout());
+        log.info("Standard error: '{}'", result.getStderr());
+        log.info("Compile output: '{}'", result.getCompile_output());
         
         // 处理标准输出
         if (result.getStdout() != null && !result.getStdout().trim().isEmpty()) {
             String trimmedOutput = result.getStdout().trim();
             outputList.add(trimmedOutput);
-            log.info("添加输出到列表: '{}'", trimmedOutput);
+            log.info("Add output to list: '{}'", trimmedOutput);
         } else {
-            log.warn("标准输出为空或null");
+            log.warn("Standard output is empty or null");
         }
         
         // 构建判题信息
@@ -365,7 +365,7 @@ public class Main implements CodeSandbox {
             try {
                 judgeInfo.setTime((long)(Double.parseDouble(result.getTime()) * 1000)); // 转换为毫秒
             } catch (NumberFormatException e) {
-                log.warn("无法解析时间字段: {}", result.getTime());
+                log.warn("Cannot parse time field: {}", result.getTime());
                 judgeInfo.setTime(0L);
             }
         } else {
@@ -373,51 +373,51 @@ public class Main implements CodeSandbox {
         }
         
         // 根据状态ID设置消息
-        String message = "执行成功";
-        Integer status = 0; // 成功状态
+        String message = "Execution successful";
+        Integer status = 0; // Success status
         
         if (result.getStatus() != null && result.getStatus().getId() != null) {
             switch (result.getStatus().getId()) {
                 case 3: // Accepted
-                    message = "执行成功";
+                    message = "Execution successful";
                     status = 0;
-                    log.info("Judge0状态: Accepted");
+                    log.info("Judge0 status: Accepted");
                     break;
                 case 4: // Wrong Answer
-                    message = "答案错误";
+                    message = "Wrong Answer";
                     status = 1;
-                    log.info("Judge0状态: Wrong Answer");
+                    log.info("Judge0 status: Wrong Answer");
                     break;
                 case 5: // Compilation Error
-                    message = "编译错误";
+                    message = "wrong answer";
                     status = 2;
                     if (result.getCompile_output() != null) {
                         message += ": " + result.getCompile_output();
                     }
-                    log.error("Judge0状态: Compilation Error - {}", message);
+                    log.error("Judge0 status: Compilation Error - {}", message);
                     break;
                 case 6: // Runtime Error
-                    message = "运行时错误";
+                    message = "Runtime Error";
                     status = 3;
                     if (result.getStderr() != null) {
                         message += ": " + result.getStderr();
                     }
-                    log.error("Judge0状态: Runtime Error - {}", message);
+                    log.error("Judge0 status: Runtime Error - {}", message);
                     break;
                 case 7: // Time Limit Exceeded
-                    message = "时间超限";
+                    message = "Time Limit Exceeded";
                     status = 4;
-                    log.warn("Judge0状态: Time Limit Exceeded");
+                    log.warn("Judge0 status: Time Limit Exceeded");
                     break;
                 case 8: // Memory Limit Exceeded
-                    message = "内存超限";
+                    message = "Memory Limit Exceeded";
                     status = 5;
-                    log.warn("Judge0状态: Memory Limit Exceeded");
+                    log.warn("Judge0 status: Memory Limit Exceeded");
                     break;
                 default:
-                    message = "未知错误";
+                    message = "Unknown error";
                     status = 6;
-                    log.error("Judge0状态: 未知错误 - {}", result.getStatus().getId());
+                    log.error("Judge0 status: Unknown error - {}", result.getStatus().getId());
                     break;
             }
         }
@@ -429,8 +429,8 @@ public class Main implements CodeSandbox {
         
         judgeInfo.setMessage(message);
         
-        log.info("最终输出列表大小: {}", outputList.size());
-        log.info("最终消息: {}", message);
+        log.info("Final output list size: {}", outputList.size());
+        log.info("Final message: {}", message);
         
         return ExecuteCodeResponse.builder()
                 .outputList(outputList)

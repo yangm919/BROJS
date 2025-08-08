@@ -5,6 +5,9 @@ spring:
     nacos:
       discovery:
         server-addr: nacos:8848
+        username: nacos
+        password: nacos
+        register-enabled: true
     gateway:
       routes:
         - id: yuoj-backend-user-service

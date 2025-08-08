@@ -301,11 +301,11 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
             
             ExecuteCodeResponse response = new ExecuteCodeResponse();
             response.setStatus(0); // Success
-            response.setMessage("执行成功");
+            response.setMessage("Execution successful");
             
             // Create JudgeInfo with memory and time
             JudgeInfo judgeInfo = new JudgeInfo();
-            judgeInfo.setMessage("执行成功");
+            judgeInfo.setMessage("Execution successful");
             
             // Extract memory information
             if (result.getMemory() != null) {
@@ -354,7 +354,7 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
         response.setMessage(errorMessage);
         
         JudgeInfo judgeInfo = new JudgeInfo();
-        judgeInfo.setMessage("执行失败");
+        judgeInfo.setMessage("Execution failed");
         judgeInfo.setMemory(0L);
         judgeInfo.setTime(0L);
         response.setJudgeInfo(judgeInfo);

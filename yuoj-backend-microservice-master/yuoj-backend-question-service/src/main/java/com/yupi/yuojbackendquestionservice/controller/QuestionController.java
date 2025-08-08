@@ -67,13 +67,6 @@ public class QuestionController {
         JudgeConfig judgeConfig = questionAddRequest.getJudgeConfig();
         if (judgeConfig != null) {
             question.setJudgeConfig(GSON.toJson(judgeConfig));
-        } else {
-            // 设置默认的判题配置
-            JudgeConfig defaultConfig = new JudgeConfig();
-            defaultConfig.setTimeLimit(1000L);
-            defaultConfig.setMemoryLimit(50000L);
-            defaultConfig.setStackLimit(1000L);
-            question.setJudgeConfig(GSON.toJson(defaultConfig));
         }
         questionService.validQuestion(question, true);
         User loginUser = userFeignClient.getLoginUser(request);
@@ -134,13 +127,6 @@ public class QuestionController {
         JudgeConfig judgeConfig = questionUpdateRequest.getJudgeConfig();
         if (judgeConfig != null) {
             question.setJudgeConfig(GSON.toJson(judgeConfig));
-        } else {
-            // 设置默认的判题配置
-            JudgeConfig defaultConfig = new JudgeConfig();
-            defaultConfig.setTimeLimit(1000L);
-            defaultConfig.setMemoryLimit(50000L);
-            defaultConfig.setStackLimit(1000L);
-            question.setJudgeConfig(GSON.toJson(defaultConfig));
         }
         // 参数校验
         questionService.validQuestion(question, false);
@@ -272,13 +258,6 @@ public class QuestionController {
         JudgeConfig judgeConfig = questionEditRequest.getJudgeConfig();
         if (judgeConfig != null) {
             question.setJudgeConfig(GSON.toJson(judgeConfig));
-        } else {
-            // 设置默认的判题配置
-            JudgeConfig defaultConfig = new JudgeConfig();
-            defaultConfig.setTimeLimit(1000L);
-            defaultConfig.setMemoryLimit(50000L);
-            defaultConfig.setStackLimit(1000L);
-            question.setJudgeConfig(GSON.toJson(defaultConfig));
         }
         // 参数校验
         questionService.validQuestion(question, false);

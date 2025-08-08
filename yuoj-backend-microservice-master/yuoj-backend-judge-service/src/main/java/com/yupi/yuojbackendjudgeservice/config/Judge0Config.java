@@ -15,7 +15,7 @@ public class Judge0Config {
     /**
      * Judge0 API 基础URL
      */
-    private String baseUrl = "https://judge0-ce.p.rapidapi.com";
+    private String baseUrl = "http://4.213.48.226:2358/";
     
     /**
      * RapidAPI 密钥
@@ -25,7 +25,7 @@ public class Judge0Config {
     /**
      * RapidAPI 主机
      */
-    private String rapidapiHost = "judge0-ce.p.rapidapi.com";
+    private String rapidapiHost = "4.213.48.226:2358";
     
     /**
      * 超时时间（秒）

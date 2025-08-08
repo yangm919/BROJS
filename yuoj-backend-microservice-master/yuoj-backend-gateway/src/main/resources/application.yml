@@ -1,8 +1,11 @@
 spring:
+  profiles:
+    active: prod
   cloud:
     nacos:
       discovery:
         server-addr: nacos:8848
+
     gateway:
       routes:
         - id: yuoj-backend-user-service
