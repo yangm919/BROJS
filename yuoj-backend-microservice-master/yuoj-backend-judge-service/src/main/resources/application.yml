@@ -67,7 +67,7 @@ mybatis-plus:
       logic-not-delete-value: 0 # Logical not deleted value (default is 0)
 # Code sandbox configuration
 codesandbox:
-  type: judge0
+  type: thirdParty
   judge0:
     base-url: https://judge0-ce.p.rapidapi.com
     rapidapi-key: 087d919e2dmshf5f3c038d699943p1fb696jsnf1a52bbb84b2

@@ -94,4 +94,17 @@ jspm_packages/
 .yarn-integrity
 
 # dotenv environment variables file
-.env 
+.env
+
+# Database and Docker data directories
+mysql-data/
+.redis-data/
+.rabbitmq-data/
+.nacos-data/
+*.sql
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker volumes
+docker-volumes/ 

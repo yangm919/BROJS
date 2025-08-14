@@ -29,10 +29,23 @@ public class JavaLanguageJudgeStrategy implements JudgeStrategy {
         JudgeInfo judgeInfoResponse = new JudgeInfo();
         judgeInfoResponse.setMemory(memory);
         judgeInfoResponse.setTime(time);
+      	System.out.println("inputList: " + inputList.toString());
+      	System.out.println("1。1");
+      	System.out.println("outputList: " + outputList);
+      	System.out.println("1。2");
+        if  (outputList  == null || (outputList.size() == 0) ||  inputList == null || (inputList.size() == 0)) {
+          judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
+          judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
+          System.out.println("judgeInfoResponse: " + judgeInfoResponse.toString());
+          System.out.println("1。3");
+          return judgeInfoResponse;
+        }
         // 先判断沙箱执行的结果输出数量是否和预期输出数量相等
         if (outputList.size() != inputList.size()) {
             judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
             judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
+            System.out.println("judgeInfoResponse: " + judgeInfoResponse.toString());
+        		System.out.println("1。4");
             return judgeInfoResponse;
         }
         // 依次判断每一项输出和预期输出是否相等
@@ -41,11 +54,14 @@ public class JavaLanguageJudgeStrategy implements JudgeStrategy {
             if (!judgeCase.getOutput().equals(outputList.get(i))) {
                 judgeInfoMessageEnum = JudgeInfoMessageEnum.WRONG_ANSWER;
                 judgeInfoResponse.setMessage(judgeInfoMessageEnum.getValue());
+              	System.out.println("judgeInfoResponse: " + judgeInfoResponse.toString());
+        				System.out.println("1。5");
                 return judgeInfoResponse;
             }
         }
         // 判断题目限制
         String judgeConfigStr = question.getJudgeConfig();
+      	System.out.println("judgeConfigStr: " + judgeConfigStr);
         JudgeConfig judgeConfig = JSONUtil.toBean(judgeConfigStr, JudgeConfig.class);
         Long needMemoryLimit = judgeConfig.getMemoryLimit();
         Long needTimeLimit = judgeConfig.getTimeLimit();

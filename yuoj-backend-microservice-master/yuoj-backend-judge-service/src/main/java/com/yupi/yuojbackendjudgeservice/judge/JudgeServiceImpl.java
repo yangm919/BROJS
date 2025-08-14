@@ -70,6 +70,8 @@ public class JudgeServiceImpl implements JudgeService {
                 .inputList(inputList)
                 .build();
         ExecuteCodeResponse executeCodeResponse = codeSandbox.executeCode(executeCodeRequest);
+      	System.out.println("executeCodeResponse: " + executeCodeResponse.toString());
+      	System.out.println("1");
         List<String> outputList = executeCodeResponse.getOutputList();
         // 5）根据沙箱的执行结果，设置题目的判题状态和信息
         JudgeContext judgeContext = new JudgeContext();
@@ -80,12 +82,17 @@ public class JudgeServiceImpl implements JudgeService {
         judgeContext.setQuestion(question);
         judgeContext.setQuestionSubmit(questionSubmit);
         JudgeInfo judgeInfo = judgeManager.doJudge(judgeContext);
+      	// JudgeInfo judgeInfo = executeCodeResponse.getJudgeInfo();
+        System.out.println("judgeInfo" + judgeInfo.toString());
+        System.out.println("2");
         // 6）修改数据库中的判题结果
         questionSubmitUpdate = new QuestionSubmit();
         questionSubmitUpdate.setId(questionSubmitId);
         // 根据判题结果设置状态
         String judgeMessage = judgeInfo.getMessage();
         log.info("judgeMessage: {}", judgeMessage);
+      	System.out.println("judgeMessage" + judgeMessage);
+        System.out.println("3");
         if ("Accepted".equals(judgeMessage)) {
             questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEED.getValue());
             // 更新问题的通过数

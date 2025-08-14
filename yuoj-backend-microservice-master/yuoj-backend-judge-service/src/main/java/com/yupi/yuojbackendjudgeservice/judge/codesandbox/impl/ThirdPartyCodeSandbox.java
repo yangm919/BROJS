@@ -9,6 +9,7 @@ import com.yupi.yuojbackendmodel.model.codesandbox.JudgeInfo;
 import com.yupi.yuojbackendmodel.model.codesandbox.judge0.Judge0ResultResponse;
 import com.yupi.yuojbackendmodel.model.codesandbox.judge0.Judge0SubmissionRequest;
 import com.yupi.yuojbackendmodel.model.codesandbox.judge0.Judge0SubmissionResponse;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -60,6 +61,7 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
             // Process multiple test cases
             List<String> outputList = new ArrayList<>();
             List<String> inputList = executeCodeRequest.getInputList();
+          	System.out.println("inputList:" + executeCodeRequest.getInputList());
             
             if (inputList == null || inputList.isEmpty()) {
                 return createErrorResponse("No test cases");
@@ -71,6 +73,7 @@ public class ThirdPartyCodeSandbox implements CodeSandbox {
             // Execute code for each test case
             for (int i = 0; i < inputList.size(); i++) {
                 String input = inputList.get(i);
+              	System.out.println("input:" + input);
                 log.info("Executing test case {}, input: {}", i + 1, input);
                 
                 // 1. Submit code to Judge0
